@@ -19,6 +19,8 @@ from local.create_mixtures_metadata import create_metadata
 from local.create_mixtures_from_metadata import create_mixture
 from pathlib import Path
 from tqdm import tqdm
+from speechbrain.augment.preparation import write_csv
+from speechbrain.augment.time_domain import AddNoise, AddReverb
 
 # Load hyperparameters file with command-line overrides
 params_file, run_opts, overrides = sb.core.parse_arguments(sys.argv[1:])
@@ -101,6 +103,9 @@ for indx, split in enumerate(["train", "dev", "eval"]):
         # noises[indx],
     )
 
+
+
+
 # from metadata we generate the actual mixtures
 
 for indx, split in enumerate(["train", "dev", "eval"]):
@@ -117,5 +122,9 @@ for indx, split in enumerate(["train", "dev", "eval"]):
     for sess in tqdm(list(c_meta.keys()), desc=f"Creating {split} set"):
         # print(c_meta[sess])
         create_mixture(sess, c_folder, params, c_meta)
+
+
+print("Adding Noise")
+
 
 print("Created Custom Dataset")

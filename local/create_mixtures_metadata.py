@@ -48,24 +48,16 @@ def create_metadata(output_filename, n_sessions, configs, utterances_dict, words
                 while start_time < tot_length and utt_idx < len(spk_utts):
                     utt = spk_utts[utt_idx]
                     meta, channel = _read_metadata(utt, configs)
-                    c_rir = np.random.choice(rir_list, 1)[0]
-                    meta_rir, rir_channel = _read_metadata(c_rir, configs)
                     utt_length = meta.num_frames / meta.sample_rate
 
                     if start_time + utt_length > start_time + segment_length:  # Ensure not to exceed each speaker's segment
                         break
 
-                    lvl = np.clip(np.random.normal(configs["speech_lvl_mean"], configs["speech_lvl_var"]),
-                                  configs["speech_lvl_min"], configs["speech_lvl_max"])
                     activity[spk_id].append({
                         "start": start_time,
                         "stop": start_time + utt_length,
                         "words": words_dict[Path(utt).stem],
-                        "rir": str(Path(c_rir).relative_to(configs["rirs_noises_root"])),
-                        "file": str(Path(utt).relative_to(configs["librispeech_root"])),
-                        "lvl": lvl,
-                        "channel": channel,
-                        "rir_channel": rir_channel,
+                        "file": str(Path(utt).relative_to(configs["librispeech_root"]))
                     })
 
                     start_time += utt_length  # Move to next utterance start time

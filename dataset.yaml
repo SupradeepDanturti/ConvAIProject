@@ -3,38 +3,33 @@
 ######################
 
 # folder where created dataset will be stored.
-out_folder: ../data
-metadata_folder: ../data/metadata
+
+out_folder: ./maindata
+metadata_folder: !ref <out_folder>/metadata
 samplerate: 16000 # dataset samplerate (should be <=16000)
-
-save_wet_sources: False
-# whether to save oracle reverberated clean-speech sources.
-
-save_dry_sources: False
-# whether to save oracle dry, non-reverberated clean-speech sources.
 
 #########################
 # Source datasets paths #
 #########################
 
-librispeech_root: ../data/LibriSpeech # e.g., /workspace/LibriParty/LibriSpeech/
+librispeech_root: !ref <out_folder>/LibriSpeech # e.g., /workspace/LibriParty/LibriSpeech/
 # /media/sam/bx500/LibriSpeech
 # root path to librispeech: download from https://openslr.org/12/
 
 librispeech_folders: # folders one wants to use for the train dataset.
   train:
-    - !ref <librispeech_root>/train-clean-100/ # e.g. clean-100 etc.
+    - !ref <out_folder>/LibriSpeech/train-clean-100/ # e.g. clean-100 etc.
   dev:
-    - !ref <librispeech_root>/dev-clean/
+    - !ref <out_folder>/LibriSpeech/dev-clean/
   eval:
-    - !ref <librispeech_root>/test-clean/
+    - !ref <out_folder>/LibriSpeech/test-clean/
 
-rirs_noises_root: ../data/RIRS_NOISES #e.g., /workspace/LibriParty/RIRS_NOISES/
+rirs_noises_root: !ref <out_folder>/RIRS_NOISES #e.g., /workspace/LibriParty/RIRS_NOISES/
 rirs_folders:
-  - !ref <rirs_noises_root>/simulated_rirs/
-  - !ref <rirs_noises_root>/real_rirs_isotropic_noises
+  - !ref <out_folder>/RIRS_NOISES/simulated_rirs/
+  - !ref <out_folder>/RIRS_NOISES/real_rirs_isotropic_noises
 noises_folders:
-  - !ref <rirs_noises_root>/pointsource_noises/
+  - !ref <out_folder>/RIRS_NOISES/pointsource_noises/
 #backgrounds_root: !PLACEHOLDER # e.g., /workspace/LibriParty/QUT_NOISE_16kHz/
 ## optional background noise from QUT (required for "official" dataset)
 ## One can use also other background noises.
@@ -53,9 +48,9 @@ split_factors:
 # for speech one can use librispeech official splits
 
 n_sessions: # number of synthetic scenes
-  train: 250
-  dev: 50
-  eval: 50
+  train: 600
+  dev: 100
+  eval: 100
 n_speakers: 5 # max number of speakers in each session
 interval_factor_speech: 5
 # this parameter controls amount of silence and
@@ -66,7 +61,7 @@ interval_factor_noises: 10
 # same parameter but for impulsive noises.
 # It controls the interval between two impulsive noises.
 
-max_length: 300 # max length in seconds for each session.
+max_length: 120 # max length in seconds for each session.
 
 # we use gaussian distribution for speech and noise levels.
 speech_lvl_min: -35 # (dB) absolute minimum level for speech.
