@@ -1,4 +1,3 @@
-
 # Your code here
 
 #!/usr/bin/env python3
@@ -60,16 +59,16 @@ class DigitBrain(sb.Brain):
 
         # Your code here. Aim for 7-8 lines
         _, lens = batch['sig']
-        digit_encoded = batch["num_speakers_encoded"].data
+        num_speakers_encoded = batch["num_speakers_encoded"].data
 
-        loss = sb.nnet.losses.nll_loss(predictions, digit_encoded, lens)
+        loss = sb.nnet.losses.nll_loss(predictions, num_speakers_encoded, lens)
         self.loss_metric.append(
-            batch.id, predictions, digit_encoded, lens, reduction="batch"
+            batch.id, predictions, num_speakers_encoded, lens, reduction="batch"
         )
 
         # Compute classification error at test time
         if stage != sb.Stage.TRAIN:
-            self.error_metrics.append(batch.id, predictions, digit_encoded, lens)
+            self.error_metrics.append(batch.id, predictions, num_speakers_encoded, lens)
         return loss
 
     def on_stage_start(self, stage, epoch=None):
