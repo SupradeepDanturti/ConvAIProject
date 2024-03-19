@@ -20,41 +20,21 @@ def create_mixture(session_n, output_dir, params, metadata):
     active_utterances = []
 
     for speaker_id, utterances in metadata[session_n].items():
-        # Initialize a list for each speaker ID if not already present
         if speaker_id not in session_meta:
             session_meta[speaker_id] = []
 
         for utterance in utterances:
-            audio_path = os.path.join(params["librispeech_root"], utterance["file"])
-            audio, _ = torchaudio.load(audio_path)
+            if utterance["file"] == "generate_silence":  # Handle "0 speakers" segments
+                silence_duration_samples = int(np.ceil((utterance["stop"] - utterance["start"]) * params["samplerate"]))
+                silence = torch.zeros(silence_duration_samples)
+                audio = silence
+            else:
+                audio_path = os.path.join(params["librispeech_root"], utterance["file"])
+                audio, _ = torchaudio.load(audio_path)
 
-            # Mono conversion and channel selection if needed
-            if audio.shape[0] > 1:
-                audio = audio[utterance["channel"]]
-
-            # print("Shape before effects:", audio.shape)
-            # clean = audio.unsqueeze(0)
-            # print("Shape after unsqueeze(0) :", clean.shape)
-            #
-            # if torch.rand(1) < 0.5:
-            #     noisy = noisifier(clean, torch.ones(clean.size(0)))
-            #     print("Shape After adding Noisy effects:", noisy.shape)
-            # else:
-            #     noisy = clean
-            #     print("Did not add noise due to probability")
-            #
-            # if noisy.dim() == 2:
-            #     noisy = noisy.unsqueeze(-1)
-            #     print("Shape After noisy.unsqueeze(-1) as noisy.dim() == 2 :", noisy.shape)
-            # if torch.rand(1) < 0.5:
-            #     reverbed = reverber(noisy)
-            #     print("Shape After adding reberb effects:", reverbed.shape)
-            # else:
-            #     reverbed = noisy
-            #     print("Did not add reberb  due to probability")
-            #
-            # audio = reverbed.squeeze(0).transpose(0, 1)
-            # print("Shape After reverbed.squeeze(0).transpose(0, 1):", audio.shape)
+                # Mono conversion and channel selection if needed
+                if audio.shape[0] > 1:
+                    audio = audio[utterance["channel"]]
 
             start_sample = int(utterance["start"] * params["samplerate"])
             stop_sample = start_sample + audio.shape[1]

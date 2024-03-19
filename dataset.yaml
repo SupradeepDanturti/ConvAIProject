@@ -48,9 +48,9 @@ split_factors:
 # for speech one can use librispeech official splits
 
 n_sessions: # number of synthetic scenes
-  train: 600
-  dev: 100
-  eval: 100
+  train: 250
+  dev: 50
+  eval: 50
 n_speakers: 5 # max number of speakers in each session
 interval_factor_speech: 5
 # this parameter controls amount of silence and

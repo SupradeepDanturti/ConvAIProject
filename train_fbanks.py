@@ -117,13 +117,9 @@ class DigitBrain(sb.Brain):
 
         # At the end of validation...
         if stage == sb.Stage.VALID:
-            old_lr, new_lr = self.hparams.lr_annealing(
-                    optim_list=[self.optimizer],
-                    current_epoch=epoch,
-                    current_loss=self.train_loss,
-                )
-            # old_lr, new_lr = self.hparams.lr_annealing(epoch)
-            # sb.nnet.schedulers.update_learning_rate(self.optimizer, new_lr)
+
+            old_lr, new_lr = self.hparams.lr_annealing(epoch)
+            sb.nnet.schedulers.update_learning_rate(self.optimizer, new_lr)
 
             # The train_logger writes a summary to stdout and to the logfile.
             self.hparams.train_logger.log_stats(

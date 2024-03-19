@@ -25,21 +25,25 @@ error_stats: !name:speechbrain.utils.metric_stats.MetricStats
 
 # Feature parameters
 n_mels: 40
+deltas: True
 
 # Training Parameters
 sample_rate: 16000
-number_of_epochs: 50
-batch_size: 128
+number_of_epochs: 100
+batch_size: 256
 lr_start: 0.001
 lr_final: 0.0001
+lr_dont_halve_until_epoch: 2
+lr_patience: 2
 n_classes: 5
-emb_dim: 128 # dimensionality of the embeddings
+emb_dim: 256 # dimensionality of the embeddings
 dataloader_options:
     batch_size: !ref <batch_size>
 
 # Feature extraction
 compute_features: !new:speechbrain.lobes.features.Fbank
     n_mels: !ref <n_mels>
+    # deltas: !ref <deltas>
 
 # Mean and std normalization of the input features
 mean_var_norm: !new:speechbrain.processing.features.InputNormalization
@@ -49,10 +53,10 @@ mean_var_norm: !new:speechbrain.processing.features.InputNormalization
 embedding_model: !new:speechbrain.lobes.models.Xvector.Xvector
     in_channels: !ref <n_mels>
     activation: !name:torch.nn.LeakyReLU
-    tdnn_blocks: 3
-    tdnn_channels: [64, 64, 128]
-    tdnn_kernel_sizes: [5, 3, 1]
-    tdnn_dilations: [1, 2, 1]
+    tdnn_blocks: 5
+    tdnn_channels: [256, 256, 256, 256, 512]
+    tdnn_kernel_sizes: [5, 3, 3, 1, 1]
+    tdnn_dilations: [1, 2, 3, 1, 1]
     lin_neurons: !ref <emb_dim>
 
 # Clasifier applied on top of the embeddings
@@ -79,16 +83,39 @@ modules:
 
 # This optimizer will be constructed by the Brain class after all parameters
 # are moved to the correct device. Then it will be added to the checkpointer.
+# 
+# opt_class: !name:torch.optim.Adadelta
+#     lr: !ref <lr>
+#     rho: 0.95
+#     eps: 1.e-8
+
+
+# opt_class: !name:torch.optim.AdamW
 opt_class: !name:torch.optim.Adam
     lr: !ref <lr_start>
+    # weight_decay: 0.000000001
 
 # This function manages learning rate annealing over the epochs.
 # We here use the simple lr annealing method that linearly decreases
 # the lr from the initial value to the final one.
-lr_annealing: !new:speechbrain.nnet.schedulers.LinearScheduler
-    initial_value: !ref <lr_start>
-    final_value: !ref <lr_final>
-    epoch_count: !ref <number_of_epochs>
+#lr_annealing: !new:speechbrain.nnet.schedulers.LinearScheduler
+#    initial_value: !ref <lr_start>
+#    final_value: !ref <lr_final>
+#    epoch_count: !ref <number_of_epochs>
+
+# 
+# lr_annealing: !new:speechbrain.nnet.schedulers.NewBobScheduler
+#     initial_value: !ref <lr>
+#     improvement_threshold: 0.0025
+#     annealing_factor: 0.8
+#     patient: 0
+
+lr_annealing: !new:speechbrain.nnet.schedulers.ReduceLROnPlateau
+    lr_min: !ref <lr_final>
+    dont_halve_until_epoch: !ref <lr_dont_halve_until_epoch>
+    patience: !ref <lr_patience>
+
+
 
 # This object is used for saving the state of training both so that it
 # can be resumed if it gets interrupted, and also so that the best checkpoint
@@ -100,3 +127,4 @@ checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
         classifier: !ref <classifier>
         normalizer: !ref <mean_var_norm>
         counter: !ref <epoch_counter>
+
