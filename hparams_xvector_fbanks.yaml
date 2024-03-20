@@ -1,4 +1,5 @@
 
+
 # Your code here
 
 # Seed needs to be set at top of yaml, before objects with parameters are made
@@ -22,7 +23,7 @@ train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
 error_stats: !name:speechbrain.utils.metric_stats.MetricStats
     metric: !name:speechbrain.nnet.losses.classification_error
         reduction: batch
-
+        
 # Feature parameters
 n_mels: 40
 deltas: True
@@ -30,13 +31,17 @@ deltas: True
 # Training Parameters
 sample_rate: 16000
 number_of_epochs: 100
-batch_size: 256
-lr_start: 0.001
-lr_final: 0.0001
-lr_dont_halve_until_epoch: 2
-lr_patience: 2
+batch_size: 64
+# lr_start: 0.001
+# lr_final: 0.0001
+# lr_dont_halve_until_epoch: 80
+# lr_patience: 1
 n_classes: 5
-emb_dim: 256 # dimensionality of the embeddings
+emb_dim: 64 # dimensionality of the embeddings
+
+
+
+
 dataloader_options:
     batch_size: !ref <batch_size>
 
@@ -54,7 +59,7 @@ embedding_model: !new:speechbrain.lobes.models.Xvector.Xvector
     in_channels: !ref <n_mels>
     activation: !name:torch.nn.LeakyReLU
     tdnn_blocks: 5
-    tdnn_channels: [256, 256, 256, 256, 512]
+    tdnn_channels: [64, 64, 64, 64, 512]
     tdnn_kernel_sizes: [5, 3, 3, 1, 1]
     tdnn_dilations: [1, 2, 3, 1, 1]
     lin_neurons: !ref <emb_dim>
@@ -90,15 +95,24 @@ modules:
 #     eps: 1.e-8
 
 
-# opt_class: !name:torch.optim.AdamW
 opt_class: !name:torch.optim.Adam
-    lr: !ref <lr_start>
-    # weight_decay: 0.000000001
+    lr: 0.001
+    weight_decay: 0.00002
 
 # This function manages learning rate annealing over the epochs.
 # We here use the simple lr annealing method that linearly decreases
 # the lr from the initial value to the final one.
-#lr_annealing: !new:speechbrain.nnet.schedulers.LinearScheduler
+
+lr_annealing: !new:speechbrain.nnet.schedulers.CyclicLRScheduler
+    mode: triangular2
+    gamma: 0.9998
+    base_lr: 0.001 #best for adam
+    max_lr: 0.004 #hope that it escapes local minima
+    step_size: 9935 #317920/64 = 4967.5 *2-8 == 9935-39740
+
+
+
+# lr_annealing: !new:speechbrain.nnet.schedulers.LinearScheduler
 #    initial_value: !ref <lr_start>
 #    final_value: !ref <lr_final>
 #    epoch_count: !ref <number_of_epochs>
@@ -110,10 +124,15 @@ opt_class: !name:torch.optim.Adam
 #     annealing_factor: 0.8
 #     patient: 0
 
-lr_annealing: !new:speechbrain.nnet.schedulers.ReduceLROnPlateau
-    lr_min: !ref <lr_final>
-    dont_halve_until_epoch: !ref <lr_dont_halve_until_epoch>
-    patience: !ref <lr_patience>
+# lr_scheduler: !new:speechbrain.nnet.schedulers.ReduceLROnPlateau
+#     lr_min: !ref <lr_final>
+#     dont_halve_until_epoch: !ref <lr_dont_halve_until_epoch>
+#     patience: !ref <lr_patience>
+
+# lr_annealing_model_3: !new:speechbrain.nnet.schedulers.CyclicCosineScheduler
+#   lr_initial: !ref <peak_lr>
+#   n_warmup_steps: !ref <warmup_steps>
+#   total_steps: !ref <total_step>
 
 
 
@@ -127,4 +146,4 @@ checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
         classifier: !ref <classifier>
         normalizer: !ref <mean_var_norm>
         counter: !ref <epoch_counter>
-
+        lr_annealing: !ref <lr_annealing>

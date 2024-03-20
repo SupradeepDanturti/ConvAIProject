@@ -30,6 +30,7 @@ rirs_folders:
   - !ref <out_folder>/RIRS_NOISES/real_rirs_isotropic_noises
 noises_folders:
   - !ref <out_folder>/RIRS_NOISES/pointsource_noises/
+
 #backgrounds_root: !PLACEHOLDER # e.g., /workspace/LibriParty/QUT_NOISE_16kHz/
 ## optional background noise from QUT (required for "official" dataset)
 ## One can use also other background noises.
@@ -40,43 +41,11 @@ noises_folders:
 #########################################################################
 
 seed: 1234  # e.g, 1234
-split_factors:
-  - 0.7
-  - 0.2
-  - 0.1
-# split factor used to split RIRs, backgrounds and noises.
-# for speech one can use librispeech official splits
 
 n_sessions: # number of synthetic scenes
-  train: 250
-  dev: 50
-  eval: 50
-n_speakers: 5 # max number of speakers in each session
-interval_factor_speech: 5
-# this parameter controls amount of silence and
-# probability of overlapped speech.
-# the higher the less silence and more overlapped speech.
-
-interval_factor_noises: 10
-# same parameter but for impulsive noises.
-# It controls the interval between two impulsive noises.
+  train: 1000
+  dev: 200
+  eval: 200
+n_speakers: 4 # max number of speakers in each session
 
 max_length: 120 # max length in seconds for each session.
-
-# we use gaussian distribution for speech and noise levels.
-speech_lvl_min: -35 # (dB) absolute minimum level for speech.
-speech_lvl_max: -3 # (dB) absolute maximum level for speech.
-speech_lvl_mean: -15 # (dB) mean for speech level.
-speech_lvl_var: 3 # (dB) variance for speech level.
-
-imp_lvl_min: -40 # (dB) absolute minimum level for noises.
-imp_lvl_rel_max: 3
-# (dB) absolute maximum for noises relative
-# to minimum speech level in the whole session.
-imp_lvl_mean: -33 # (dB) mean for speech level
-imp_lvl_var: 2 # (dB) variance for speech level
-
-background_lvl_min: -60 # (dB) absolute minimum level for background.
-background_lvl_rel_max: -12
-# (dB) absolute maximum for background relative
-# to minimum speech level in the whole session.

@@ -20,15 +20,31 @@ def create_mixture(session_n, output_dir, params, metadata):
     active_utterances = []
 
     for speaker_id, utterances in metadata[session_n].items():
+
         if speaker_id not in session_meta:
             session_meta[speaker_id] = []
 
         for utterance in utterances:
-            if utterance["file"] == "generate_silence":  # Handle "0 speakers" segments
+
+            if speaker_id == "0":
+                """We create 0 speaker utterances using torch.zeros"""
                 silence_duration_samples = int(np.ceil((utterance["stop"] - utterance["start"]) * params["samplerate"]))
-                silence = torch.zeros(silence_duration_samples)
-                audio = silence
+                silence_start_sample = int(utterance["start"] * params["samplerate"])
+                silence_stop_sample = silence_start_sample + silence_duration_samples
+
+                if silence_stop_sample > mixture.shape[0]:
+                    additional_length = silence_stop_sample - mixture.shape[0]
+                    mixture = torch.cat((mixture, torch.zeros(additional_length)), 0)
+
+                session_meta[speaker_id].append({
+                    "file": utterance["file"],
+                    "start": utterance["start"],
+                    "stop": utterance["stop"],
+                    "words": utterance["words"]
+                })
+
             else:
+                """We create 1-4 speaker utterances"""
                 audio_path = os.path.join(params["librispeech_root"], utterance["file"])
                 audio, _ = torchaudio.load(audio_path)
 
@@ -36,31 +52,31 @@ def create_mixture(session_n, output_dir, params, metadata):
                 if audio.shape[0] > 1:
                     audio = audio[utterance["channel"]]
 
-            start_sample = int(utterance["start"] * params["samplerate"])
-            stop_sample = start_sample + audio.shape[1]
+                start_sample = int(utterance["start"] * params["samplerate"])
+                stop_sample = start_sample + audio.shape[1]
 
-            # Ensure mixture can accommodate current utterance
-            if stop_sample > mixture.shape[0]:
-                additional_length = stop_sample - mixture.shape[0]
-                mixture = torch.cat((mixture, torch.zeros(additional_length)), 0)
+                # Ensure mixture can accommodate current utterance
+                if stop_sample > mixture.shape[0]:
+                    additional_length = stop_sample - mixture.shape[0]
+                    mixture = torch.cat((mixture, torch.zeros(additional_length)), 0)
 
-            # Make sure audio is 1D before adding it to the mixture
-            if audio.dim() > 1:
-                audio = audio.squeeze()  # Squeeze audio to ensure it's 1D
+                # Make sure audio is 1D before adding it to the mixture
+                if audio.dim() > 1:
+                    audio = audio.squeeze()  # Squeeze audio to ensure it's 1D
 
-            # Add current utterance to the mixture
-            mixture[start_sample:stop_sample] += audio
+                # Add current utterance to the mixture
+                mixture[start_sample:stop_sample] += audio
 
-            # Update active utterances for overlap management
-            active_utterances.append((start_sample, stop_sample))
+                # Update active utterances for overlap management
+                active_utterances.append((start_sample, stop_sample))
 
-            # Append utterance details to the corresponding speaker ID in session_meta
-            session_meta[speaker_id].append({
-                "file": utterance["file"],
-                "start": utterance["start"],
-                "stop": utterance["stop"],
-                "words": utterance["words"]
-            })
+                # Append utterance details to the corresponding speaker ID in session_meta
+                session_meta[speaker_id].append({
+                    "file": utterance["file"],
+                    "start": utterance["start"],
+                    "stop": utterance["stop"],
+                    "words": utterance["words"]
+                })
 
     # Clamp mixture to avoid clipping
     mixture = torch.clamp(mixture, min=-1.0, max=1.0)

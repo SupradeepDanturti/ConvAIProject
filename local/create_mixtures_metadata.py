@@ -44,7 +44,7 @@ def generate_silence(duration, sample_rate):
     return silence
 
 
-def create_metadata(output_filename, n_sessions, configs, utterances_dict, words_dict, rir_list):
+def create_metadata(output_filename, n_sessions, configs, utterances_dict, words_dict):
     dataset_metadata = {}
     for n_sess in tqdm(range(n_sessions), desc="Generating sessions"):
         """Creating 0 Speaker Utterance"""

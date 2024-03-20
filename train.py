@@ -7,6 +7,7 @@ import sys
 import torch
 import torchaudio
 import speechbrain as sb
+import speechbrain.nnet.schedulers as schedulers
 from hyperpyyaml import load_hyperpyyaml
 
 
@@ -68,6 +69,8 @@ class DigitBrain(sb.Brain):
 
         # Compute classification error at test time
         if stage != sb.Stage.TRAIN:
+            if hasattr(self.hparams.lr_annealing, "on_batch_end"):
+                self.hparams.lr_annealing.on_batch_end(self.optimizer)
             self.error_metrics.append(batch.id, predictions, num_speakers_encoded, lens)
         return loss
 
@@ -105,7 +108,7 @@ class DigitBrain(sb.Brain):
         """
 
         # Store the train loss until the validation stage.
-        if stage == sb.Stage.TRAIN:
+        if stage == sb.Stage.TRAIN:              
             self.train_loss = stage_loss
 
         # Summarize the statistics from the stage for record-keeping.
@@ -117,13 +120,26 @@ class DigitBrain(sb.Brain):
 
         # At the end of validation...
         if stage == sb.Stage.VALID:
-            old_lr, new_lr = self.hparams.lr_annealing(
-                    optim_list=[self.optimizer],
-                    current_epoch=epoch,
-                    current_loss=self.train_loss,
-                )
-            # old_lr, new_lr = self.hparams.lr_annealing(epoch)
-            # sb.nnet.schedulers.update_learning_rate(self.optimizer, new_lr)
+            # if isinstance(
+            #     self.hparams.lr_scheduler, schedulers.ReduceLROnPlateau
+            # ):
+            #     current_lr, next_lr = self.hparams.lr_scheduler(
+            #         [self.optimizer], epoch, stage_loss
+            #     )
+            #     sb.nnet.schedulers.update_learning_rate(self.optimizer, next_lr)
+            # elif isinstance(
+            #         self.hparams.lr_annealing,
+            #         sb.nnet.schedulers.CyclicCosineScheduler,
+            #     ):
+            #     current_lr, next_lr = self.hparams.lr_annealing(stage_loss)
+            #     sb.nnet.schedulers.update_learning_rate(self.optimizer, next_lr)
+            #     
+            # else:
+            #     current_lr, next_lr = self.hparams.lr_annealing(epoch)
+            #     sb.nnet.schedulers.update_learning_rate(self.optimizer, next_lr)
+            
+            old_lr, new_lr = self.hparams.lr_annealing(epoch)
+            sb.nnet.schedulers.update_learning_rate(self.optimizer, new_lr)
 
             # The train_logger writes a summary to stdout and to the logfile.
             self.hparams.train_logger.log_stats(

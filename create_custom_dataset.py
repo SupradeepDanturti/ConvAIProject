@@ -74,20 +74,6 @@ def parse_libri_folder(libri_folders):
 
     return speakers, words_dict
 
-
-# split
-split_f = params["split_factors"]
-# we get all noises and rirs
-noises = []
-for f in params["noises_folders"]:
-    noises.extend(get_all_files(f, match_and=[".wav"]))
-rirs = []
-for f in params["rirs_folders"]:
-    rirs.extend(get_all_files(f, match_and=[".wav"]))
-# we split them in training, dev and eval
-noises = split_list(noises, split_f)
-rirs = split_list(rirs, split_f)
-
 os.makedirs(os.path.join(params["out_folder"], "metadata"), exist_ok=True)
 
 # we generate metadata for each split
@@ -103,8 +89,6 @@ for indx, split in enumerate(["train", "dev", "eval"]):
         params,
         c_utterances,
         c_words,
-        rirs[indx],
-        # noises[indx],
     )
 
 # from metadata we generate the actual mixtures
@@ -143,13 +127,11 @@ def create_segments(x="train"):
             start_sample = segment_id * num_samples_per_segment
             end_sample = start_sample + num_samples_per_segment
 
-            # Only process segments that don't require padding
             if end_sample <= waveform.size(1):
                 segment_waveform = waveform[:, start_sample:end_sample]
 
                 segment_file_name = f"{os.path.splitext(wav_path)[0]}_{segment_id:03d}_segment.wav"
                 torchaudio.save(segment_file_name, segment_waveform, sample_rate)
-
 
 
 create_segments("train")
