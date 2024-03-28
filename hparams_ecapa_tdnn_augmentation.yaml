@@ -23,27 +23,28 @@ rir_annotation: !ref <data_folder>/simulated_rirs.csv
 
 # Training parameters
 sample_rate: 16000
-number_of_epochs: 1
+number_of_epochs: 50
 batch_size: 64
 lr_start: 0.001
 lr_final: 0.0001
 weight_decay: 0.00002
 num_workers: 0 # for Windows 
 n_classes: 5
-emb_dim: 192
+dim: 192
 num_attention_channels: 128
+shuffle: True
+
+lr: 0.0001
+mode: exp_range
+gamma: 0.9998
+base_lr: 0.000001
+max_lr: !ref <lr>
+step_size: 396
 
 dataloader_options:
     batch_size: !ref <batch_size>
     num_workers: !ref <num_workers>
-
-# Logging
-train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
-    save_file: !ref <train_log>
-
-error_stats: !name:speechbrain.utils.metric_stats.MetricStats
-    metric: !name:speechbrain.nnet.losses.classification_error
-        reduction: batch
+    shuffle: !ref <shuffle>
 
 # Checkpoint settings
 ckpt_enable: True
@@ -135,14 +136,14 @@ mean_var_norm: !new:speechbrain.processing.features.InputNormalization
         
 embedding_model: !new:speechbrain.lobes.models.ECAPA_TDNN.ECAPA_TDNN
     input_size: !ref <n_mels>
-    channels: [1024, 1024, 1024, 1024, 3072]
+    channels: [256, 256, 256, 256, 768]
     kernel_sizes: [5, 3, 3, 3, 1]
     dilations: [1, 2, 3, 4, 1]
     attention_channels: !ref <num_attention_channels>
-    lin_neurons: !ref <emb_dim>
+    lin_neurons: !ref <dim>
         
 classifier: !new:speechbrain.lobes.models.ECAPA_TDNN.Classifier
-    input_size: !ref <emb_dim>
+    input_size: !ref <dim>
     out_neurons: !ref <n_classes>
         
 epoch_counter: !new:speechbrain.utils.epoch_loop.EpochCounter
@@ -152,9 +153,12 @@ modules:
     compute_features: !ref <compute_features>
     embedding_model: !ref <embedding_model>
     classifier: !ref <classifier>
-    mean_var_norm: !new:speechbrain.processing.features.InputNormalization
-        norm_type: sentence
-        std_norm: False
+    mean_var_norm: !ref <mean_var_norm>
+
+compute_cost: !new:speechbrain.nnet.losses.LogSoftmaxWrapper
+    loss_fn: !new:speechbrain.nnet.losses.AdditiveAngularMargin
+        margin: 0.2
+        scale: 30
 
 # Optimizer configuration
 opt_class: !name:torch.optim.Adam
@@ -162,10 +166,20 @@ opt_class: !name:torch.optim.Adam
     weight_decay: !ref <weight_decay>
 
 # Learning rate scheduling
-lr_annealing: !new:speechbrain.nnet.schedulers.LinearScheduler
-    initial_value: !ref <lr_start>
-    final_value: !ref <lr_final>
-    epoch_count: !ref <number_of_epochs>
+        
+lr_annealing: !new:speechbrain.nnet.schedulers.CyclicLRScheduler
+    base_lr: !ref <base_lr>
+    max_lr: !ref <max_lr>
+    step_size: !ref <step_size>
+
+# Logging
+train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
+    save_file: !ref <train_log>
+
+error_stats: !name:speechbrain.utils.metric_stats.MetricStats
+    metric: !name:speechbrain.nnet.losses.classification_error
+        reduction: batch
+
 
 # Checkpointing to save and resume training
 checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer

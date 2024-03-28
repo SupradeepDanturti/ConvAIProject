@@ -1,4 +1,5 @@
         
+        
 #!/usr/bin/env python3
 
 import os
@@ -12,11 +13,14 @@ class ECAPABrain(sb.Brain):
     """Class that manages the training loop. See speechbrain.core.Brain."""
     
     def compute_forward(self, batch, stage):
-        """Forward pass to compute embeddings and class predictions."""
+        """Computation pipeline based on a encoder + speaker classifier.
+        Data augmentation and environmental corruption are applied to the
+        input speech.
+        """
         batch = batch.to(self.device)
         wavs, lens = batch.sig
 
-        # Data augmentation (if in training stage)
+        # Add waveform augmentation if specified.
         if stage == sb.Stage.TRAIN and hasattr(self.hparams, "wav_augment"):
             wavs, lens = self.hparams.wav_augment(wavs, lens)
 
@@ -24,51 +28,61 @@ class ECAPABrain(sb.Brain):
         feats = self.modules.compute_features(wavs)
         feats = self.modules.mean_var_norm(feats, lens)
 
-        # Embedding and classification
+        # Embeddings + classifier
         embeddings = self.modules.embedding_model(feats)
-        predictions = self.modules.classifier(embeddings)
+        outputs = self.modules.classifier(embeddings)
 
-        return predictions, lens
+        return outputs, lens
 
     def compute_objectives(self, predictions, batch, stage):
-        """Compute the loss (NLL) between predicted and true labels."""
+        """Computes the loss using speaker-id as label."""
         predictions, lens = predictions
-        uttid = batch.id
-        targets, _ = batch.num_speakers_encoded
+        spkenc, _ = batch.num_speakers_encoded
 
-        # Concatenate labels (if data augmentation is used)
+        # Concatenate labels (due to data augmentation)
         if stage == sb.Stage.TRAIN and hasattr(self.hparams, "wav_augment"):
-            targets = self.hparams.wav_augment.replicate_labels(targets)
+            spkenc = self.hparams.wav_augment.replicate_labels(spkenc)
 
-        loss = sb.nnet.losses.nll_loss(predictions, targets, lens)
+        loss = self.hparams.compute_cost(predictions, spkenc, lens)
 
-        # Metric tracking
+        if stage == sb.Stage.TRAIN and hasattr(
+            self.hparams.lr_annealing, "on_batch_end"
+        ):
+            self.hparams.lr_annealing.on_batch_end(self.optimizer)
+
         if stage != sb.Stage.TRAIN:
-            self.error_metrics.append(uttid, predictions, targets, lens)
+            self.error_metrics.append(batch.id, predictions, spkenc, lens)
 
         return loss
 
     def on_stage_start(self, stage, epoch=None):
-        """Called at the beginning of each epoch, sets up metrics"""
+        """Gets called at the beginning of an epoch."""
         if stage != sb.Stage.TRAIN:
             self.error_metrics = self.hparams.error_stats()
 
     def on_stage_end(self, stage, stage_loss, epoch=None):
-        """Called at the end of an epoch, summarizes metrics, adjusts learning rate"""
+        """Gets called at the end of an epoch."""
+        # Compute/store important stats
+        stage_stats = {"loss": stage_loss}
         if stage == sb.Stage.TRAIN:
-            self.train_stats = {"loss": stage_loss}
+            self.train_stats = stage_stats
         else:
-            stats = {"loss": stage_loss, "error": self.error_metrics.summarize("average")}
+            stage_stats["ErrorRate"] = self.error_metrics.summarize("average")
 
+        # Perform end-of-iteration things, like annealing, logging, etc.
         if stage == sb.Stage.VALID:
             old_lr, new_lr = self.hparams.lr_annealing(epoch)
             sb.nnet.schedulers.update_learning_rate(self.optimizer, new_lr)
+
             self.hparams.train_logger.log_stats(
                 stats_meta={"epoch": epoch, "lr": old_lr},
                 train_stats=self.train_stats,
-                valid_stats=stats,
+                valid_stats=stage_stats,
             )
-            self.checkpointer.save_and_keep_only(meta=stats, min_keys=["error"])
+            self.checkpointer.save_and_keep_only(
+                meta={"ErrorRate": stage_stats["ErrorRate"]},
+                min_keys=["ErrorRate"],
+            )
 
 def dataio_prep(hparams):
     """Prepares the data IO (loading datasets, defining processing pipelines)"""
@@ -89,8 +103,8 @@ def dataio_prep(hparams):
     # Define label pipeline
     @sb.utils.data_pipeline.takes("num_speakers")
     @sb.utils.data_pipeline.provides("num_speakers_encoded")
-    def label_pipeline(spk_id):
-        num_speakers_encoded = label_encoder.encode_sequence_torch([spk_id])
+    def label_pipeline(num_speakers):
+        num_speakers_encoded = label_encoder.encode_label_torch(num_speakers)
         yield num_speakers_encoded
 
     # Create datasets
@@ -149,10 +163,8 @@ if __name__ == "__main__":
     )
 
     # Evaluate the model
-    if not sb.utils.distributed.if_multiple_gpus(run_opts):
-        ecapa_brain.evaluate(
-            test_set=datasets["test"],
-            min_key="error",
-            test_loader_kwargs=hparams["dataloader_options"],
-        )
-
+    ecapa_brain.evaluate(
+        test_set=datasets["test"],
+        min_key="error",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
