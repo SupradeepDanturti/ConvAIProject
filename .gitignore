@@ -6,5 +6,8 @@
 *.rar
 *.tar
 *.zip
+*.pyc
 .ipynb_checkpoints
 .git
+.idea
+data/
