@@ -8,6 +8,7 @@ Samuele Cornell, 2020
 
 import argparse
 import os
+import speechbrain
 from speechbrain.utils.data_utils import download_file
 from local.resample_folder import resample_folder
 
