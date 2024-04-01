@@ -4,48 +4,41 @@
 
 # folder where created dataset will be stored.
 
-out_folder: ./maindata
+out_folder: ../data
 metadata_folder: !ref <out_folder>/metadata
-samplerate: 16000 # dataset samplerate (should be <=16000)
+samplerate: 16000
 
 #########################
 # Source datasets paths #
 #########################
 
-librispeech_root: !ref <out_folder>/LibriSpeech # e.g., /workspace/LibriParty/LibriSpeech/
-# /media/sam/bx500/LibriSpeech
-# root path to librispeech: download from https://openslr.org/12/
+librispeech_root: !ref <out_folder>/LibriSpeech # e.g., /workspace/LibriSpeech/
 
-librispeech_folders: # folders one wants to use for the train dataset.
+librispeech_folders:
   train:
-    - !ref <out_folder>/LibriSpeech/train-clean-100/ # e.g. clean-100 etc.
+    - !ref <out_folder>/LibriSpeech/train-clean-100/
   dev:
     - !ref <out_folder>/LibriSpeech/dev-clean/
   eval:
     - !ref <out_folder>/LibriSpeech/test-clean/
 
-rirs_noises_root: !ref <out_folder>/RIRS_NOISES #e.g., /workspace/LibriParty/RIRS_NOISES/
+rirs_noises_root: !ref <out_folder>/RIRS_NOISES
 rirs_folders:
   - !ref <out_folder>/RIRS_NOISES/simulated_rirs/
   - !ref <out_folder>/RIRS_NOISES/real_rirs_isotropic_noises
 noises_folders:
   - !ref <out_folder>/RIRS_NOISES/pointsource_noises/
 
-#backgrounds_root: !PLACEHOLDER # e.g., /workspace/LibriParty/QUT_NOISE_16kHz/
-## optional background noise from QUT (required for "official" dataset)
-## One can use also other background noises.
-
-
 #########################################################################
 # Metadata creation parameters (Used only for custom dataset generation).
 #########################################################################
 
-seed: 1234  # e.g, 1234
+seed: 1234
 
-n_sessions: # number of synthetic scenes
-  train: 1000
-  dev: 200
-  eval: 200
-n_speakers: 4 # max number of speakers in each session
+n_sessions:
+  train: 1000 #1000
+  dev: 200 #200
+  eval: 200 #200
+n_speakers: 4 # max number of speakers in each session/utterance created i.e., 0 to n_speakers in each utterance.
 
-max_length: 120 # max length in seconds for each session.
+max_length: 120 # max length in seconds for each session/utterance.

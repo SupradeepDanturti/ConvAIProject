@@ -1,16 +1,22 @@
 """
-Source datasets downloading script for LibriParty.
-
-Author
-------
-Samuele Cornell, 2020
+Script to download datasets for SpeakerCounter.
 """
 
 import argparse
 import os
+import tarfile
 import speechbrain
 from speechbrain.utils.data_utils import download_file
 from local.resample_folder import resample_folder
+
+
+def extract_tar_gz(file_path, output_path):
+    """Extracts a .tar.gz file to the specified output path."""
+    if file_path.endswith(".tar.gz"):
+        with tarfile.open(file_path, "r:gz") as tar:
+            tar.extractall(path=output_path)
+        os.remove(file_path)  # Optionally remove the .tar.gz file after extraction
+
 
 LIBRISPEECH_URLS = [
     "http://www.openslr.org/resources/12/test-clean.tar.gz",
@@ -37,7 +43,8 @@ if args.stage <= 0:
     print("Stage 0: Downloading LibriSpeech")
     for url in LIBRISPEECH_URLS:
         name = url.split("/")[-1]
-        download_file(url, os.path.join(args.output_folder, name), unpack=True)
+        download_file(url, os.path.join(args.output_folder, name), unpack=False)
+        extract_tar_gz(os.path.join(args.output_folder, name), args.output_folder)
 
 if args.stage <= 1:
     print("Stage 1: Downloading RIRs and Noises")

@@ -1,9 +1,5 @@
 """
 Custom LibriParty creation script with user specified parameters.
-
-Author
-------
-Samuele Cornell, 2020
 """
 
 import os
@@ -36,8 +32,6 @@ random.seed(params["seed"])
 
 
 # we parse the yaml, and create mixtures for every train, dev and eval split.
-
-
 def split_list(array, split_factors):
     assert round(sum(split_factors), 6) == 1, "split_factors should sum to one"
     np.random.shuffle(array)
