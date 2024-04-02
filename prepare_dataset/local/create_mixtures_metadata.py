@@ -1,10 +1,5 @@
 """
-This file contains functions to create json metadata used to create
-mixtures which simulate a multi-party conversation in a noisy scenario.
-
-Author
-------
-Samuele Cornell, 2020
+Create mixtures into a json file which contains overlapped utterances.
 """
 
 import numpy as np
