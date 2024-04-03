@@ -32,14 +32,14 @@ time_resolution: 0.01
 # Training Parameters
 sample_rate: 16000
 number_of_epochs: 50
-batch_size: 64
+batch_size: 512
 lr_start: 0.001
 lr_final: 0.0001
 
 weight_decay: 0.00002
 # lr_patience: 1
 n_classes: 5
-emb_dim: 128 # dimensionality of the embeddings
+emb_dim: 512 # dimensionality of the embeddings
 
 dataloader_options:
     batch_size: !ref <batch_size>
@@ -61,7 +61,7 @@ embedding_model: !new:speechbrain.lobes.models.Xvector.Xvector
     in_channels: !ref <n_mels>
     activation: !name:torch.nn.LeakyReLU
     tdnn_blocks: 5
-    tdnn_channels: [128, 128, 128, 128, 384]
+    tdnn_channels: [256, 256, 256, 256, 1024]
     tdnn_kernel_sizes: [5, 3, 3, 1, 1]
     tdnn_dilations: [1, 2, 3, 1, 1]
     lin_neurons: !ref <emb_dim>

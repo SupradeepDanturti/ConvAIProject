@@ -1,6 +1,6 @@
-2024-04-01 20:57:17,878 - speechbrain.core - INFO - Beginning experiment!
-2024-04-01 20:57:17,879 - speechbrain.core - INFO - Experiment folder: ../results/XVector/UnAugmented/fft/1986
-2024-04-01 20:57:18,772 - speechbrain.utils.superpowers - DEBUG - absl-py @ file:///C:/b/abs_d3cv5rzljl/croot/absl-py_1686852506854/work
+2024-04-01 23:53:00,922 - speechbrain.core - INFO - Beginning experiment!
+2024-04-01 23:53:00,922 - speechbrain.core - INFO - Experiment folder: ../results/XVector/UnAugmented/fft/1986
+2024-04-01 23:53:01,802 - speechbrain.utils.superpowers - DEBUG - absl-py @ file:///C:/b/abs_d3cv5rzljl/croot/absl-py_1686852506854/work
 accelerate==0.26.1
 aiohttp @ file:///C:/b/abs_27h_1rpxgd/croot/aiohttp_1707342354614/work
 aiosignal @ file:///tmp/build/80754af9/aiosignal_1637843061372/work
@@ -188,14 +188,47 @@ yarl @ file:///C:/b/abs_8bxwdyhjvp/croot/yarl_1701105248152/work
 zipp==3.17.0
 
 
-2024-04-01 20:57:18,911 - speechbrain.utils.superpowers - DEBUG - bce1d1d
+2024-04-01 23:53:01,870 - speechbrain.utils.superpowers - DEBUG - 87279b6
 
 
-2024-04-01 20:57:19,801 - speechbrain.dataio.encoder - DEBUG - Would load categorical encoding from ../results/XVector/UnAugmented/fft/1986/save\label_encoder.txt, but file doesn't exist yet.
-2024-04-01 20:57:20,655 - speechbrain.dataio.encoder - INFO - Load called, but CategoricalEncoder is not empty. Loaded data will overwrite everything. This is normal if there is e.g. an unk label defined at init.
-2024-04-01 20:57:20,661 - speechbrain.dataio.encoder - DEBUG - Loaded categorical encoding from ../results/XVector/UnAugmented/fft/1986/save\label_encoder.txt
-2024-04-01 20:57:20,766 - speechbrain.core - INFO - Gradscaler enabled: False. Using precision: fp32.
-2024-04-01 20:57:20,767 - speechbrain.core - INFO - 308.2k trainable parameters in DigitBrain
-2024-04-01 20:57:20,768 - speechbrain.utils.checkpoints - INFO - Would load a checkpoint here, but none found yet.
-2024-04-01 20:57:20,768 - speechbrain.utils.epoch_loop - INFO - Going into epoch 1
-2024-04-01 20:57:20,782 - speechbrain.dataio.encoder - DEBUG - CategoricalEncoder.expect_len was never called: assuming category count of 5 to be correct! Sanity check your encoder using `.expect_len`. Ensure that downstream code also uses the correct size. If you are sure this does not apply to you, use `.ignore_len`.
+2024-04-01 23:53:02,866 - speechbrain.dataio.encoder - DEBUG - Would load categorical encoding from ../results/XVector/UnAugmented/fft/1986/save\label_encoder.txt, but file doesn't exist yet.
+2024-04-01 23:53:03,737 - speechbrain.dataio.encoder - INFO - Load called, but CategoricalEncoder is not empty. Loaded data will overwrite everything. This is normal if there is e.g. an unk label defined at init.
+2024-04-01 23:53:03,737 - speechbrain.dataio.encoder - DEBUG - Loaded categorical encoding from ../results/XVector/UnAugmented/fft/1986/save\label_encoder.txt
+2024-04-01 23:53:03,887 - speechbrain.core - INFO - Gradscaler enabled: False. Using precision: fp32.
+2024-04-01 23:53:03,888 - speechbrain.core - INFO - 2.1M trainable parameters in DigitBrain
+2024-04-01 23:53:03,889 - speechbrain.utils.checkpoints - INFO - Would load a checkpoint here, but none found yet.
+2024-04-01 23:53:03,889 - speechbrain.utils.epoch_loop - INFO - Going into epoch 1
+2024-04-01 23:53:03,900 - speechbrain.dataio.encoder - DEBUG - CategoricalEncoder.expect_len was never called: assuming category count of 5 to be correct! Sanity check your encoder using `.expect_len`. Ensure that downstream code also uses the correct size. If you are sure this does not apply to you, use `.ignore_len`.
+2024-04-02 01:43:47,869 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.001 to 0.00098
+2024-04-02 01:43:47,872 - speechbrain.utils.train_logger - INFO - Epoch: 1, lr: 1.00e-03 - train loss: 6.32e-01 - valid loss: 6.13e-01, valid error: 2.61e-01
+2024-04-02 01:43:47,910 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+01-43-47+00
+2024-04-02 01:43:47,919 - speechbrain.utils.epoch_loop - INFO - Going into epoch 2
+2024-04-02 03:34:10,564 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00098 to 0.00096
+2024-04-02 03:34:10,567 - speechbrain.utils.train_logger - INFO - Epoch: 2, lr: 9.82e-04 - train loss: 5.65e-01 - valid loss: 6.18e-01, valid error: 2.62e-01
+2024-04-02 03:34:10,601 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+03-34-10+00
+2024-04-02 03:34:10,610 - speechbrain.utils.epoch_loop - INFO - Going into epoch 3
+2024-04-02 05:24:35,176 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00096 to 0.00094
+2024-04-02 05:24:35,180 - speechbrain.utils.train_logger - INFO - Epoch: 3, lr: 9.63e-04 - train loss: 5.38e-01 - valid loss: 5.68e-01, valid error: 2.36e-01
+2024-04-02 05:24:35,211 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+05-24-35+00
+2024-04-02 05:24:35,236 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+01-43-47+00
+2024-04-02 05:24:35,238 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+03-34-10+00
+2024-04-02 05:24:35,239 - speechbrain.utils.epoch_loop - INFO - Going into epoch 4
+2024-04-02 07:14:59,539 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00094 to 0.00093
+2024-04-02 07:14:59,542 - speechbrain.utils.train_logger - INFO - Epoch: 4, lr: 9.45e-04 - train loss: 5.19e-01 - valid loss: 5.50e-01, valid error: 2.28e-01
+2024-04-02 07:14:59,575 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+07-14-59+00
+2024-04-02 07:14:59,590 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+05-24-35+00
+2024-04-02 07:14:59,599 - speechbrain.utils.epoch_loop - INFO - Going into epoch 5
+2024-04-02 09:05:31,988 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00093 to 0.00091
+2024-04-02 09:05:31,989 - speechbrain.utils.train_logger - INFO - Epoch: 5, lr: 9.27e-04 - train loss: 5.01e-01 - valid loss: 5.55e-01, valid error: 2.29e-01
+2024-04-02 09:05:32,033 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+09-05-31+00
+2024-04-02 09:05:32,049 - speechbrain.utils.epoch_loop - INFO - Going into epoch 6
+2024-04-02 10:56:53,941 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00091 to 0.00089
+2024-04-02 10:56:53,943 - speechbrain.utils.train_logger - INFO - Epoch: 6, lr: 9.08e-04 - train loss: 4.84e-01 - valid loss: 5.33e-01, valid error: 2.18e-01
+2024-04-02 10:56:53,983 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+10-56-53+00
+2024-04-02 10:56:54,013 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+09-05-31+00
+2024-04-02 10:56:54,015 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+07-14-59+00
+2024-04-02 10:56:54,015 - speechbrain.utils.epoch_loop - INFO - Going into epoch 7
+2024-04-02 12:49:14,079 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00089 to 0.00087
+2024-04-02 12:49:14,085 - speechbrain.utils.train_logger - INFO - Epoch: 7, lr: 8.90e-04 - train loss: 4.70e-01 - valid loss: 6.04e-01, valid error: 2.52e-01
+2024-04-02 12:49:14,119 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\UnAugmented\fft\1986\save\CKPT+2024-04-02+12-49-14+00
+2024-04-02 12:49:14,142 - speechbrain.utils.epoch_loop - INFO - Going into epoch 8
