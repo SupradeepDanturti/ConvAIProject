@@ -1,0 +1,204 @@
+2024-04-08 20:05:38,299 - speechbrain.core - INFO - Beginning experiment!
+2024-04-08 20:05:38,299 - speechbrain.core - INFO - Experiment folder: ../results/XVector/Augmented_2/1986
+2024-04-08 20:05:39,046 - speechbrain.utils.superpowers - DEBUG - anyio==4.3.0
+argon2-cffi==23.1.0
+argon2-cffi-bindings==21.2.0
+arrow==1.3.0
+asttokens==2.4.1
+async-lru==2.0.4
+attrs==23.2.0
+Babel==2.14.0
+beautifulsoup4==4.12.3
+bleach==6.1.0
+certifi==2024.2.2
+cffi==1.16.0
+charset-normalizer==3.3.2
+colorama==0.4.6
+comm==0.2.2
+contourpy==1.2.1
+cycler==0.12.1
+debugpy==1.8.1
+decorator==5.1.1
+defusedxml==0.7.1
+exceptiongroup==1.2.0
+executing==2.0.1
+fastjsonschema==2.19.1
+filelock==3.9.0
+fonttools==4.51.0
+fqdn==1.5.1
+fsspec==2023.4.0
+h11==0.14.0
+httpcore==1.0.5
+httpx==0.27.0
+huggingface-hub==0.22.2
+HyperPyYAML==1.2.2
+idna==3.6
+importlib_metadata==7.1.0
+importlib_resources==6.4.0
+ipykernel==6.29.4
+ipython==8.18.1
+ipywidgets==8.1.2
+isoduration==20.11.0
+jedi==0.19.1
+Jinja2==3.1.2
+joblib==1.3.2
+json5==0.9.24
+jsonpointer==2.4
+jsonschema==4.21.1
+jsonschema-specifications==2023.12.1
+jupyter==1.0.0
+jupyter-console==6.6.3
+jupyter-events==0.10.0
+jupyter-lsp==2.2.4
+jupyter_client==8.6.1
+jupyter_core==5.7.2
+jupyter_server==2.13.0
+jupyter_server_terminals==0.5.3
+jupyterlab==4.1.5
+jupyterlab_pygments==0.3.0
+jupyterlab_server==2.25.4
+jupyterlab_widgets==3.0.10
+kiwisolver==1.4.5
+MarkupSafe==2.1.3
+matplotlib==3.8.4
+matplotlib-inline==0.1.6
+mistune==3.0.2
+mpmath==1.3.0
+nbclient==0.10.0
+nbconvert==7.16.3
+nbformat==5.10.3
+nest-asyncio==1.6.0
+networkx==3.2.1
+notebook==7.1.2
+notebook_shim==0.2.4
+numpy==1.26.4
+overrides==7.7.0
+packaging==24.0
+pandocfilters==1.5.1
+parso==0.8.3
+pillow==10.2.0
+platformdirs==4.2.0
+prometheus_client==0.20.0
+prompt-toolkit==3.0.43
+psutil==5.9.8
+pure-eval==0.2.2
+pycparser==2.22
+Pygments==2.17.2
+pyparsing==3.1.2
+python-dateutil==2.9.0.post0
+python-json-logger==2.0.7
+pywin32==306
+pywinpty==2.0.13
+PyYAML==6.0.1
+pyzmq==25.1.2
+qtconsole==5.5.1
+QtPy==2.4.1
+referencing==0.34.0
+regex==2023.12.25
+requests==2.31.0
+rfc3339-validator==0.1.4
+rfc3986-validator==0.1.1
+rpds-py==0.18.0
+ruamel.yaml==0.18.6
+ruamel.yaml.clib==0.2.8
+safetensors==0.4.2
+scipy==1.13.0
+Send2Trash==1.8.2
+sentencepiece==0.2.0
+six==1.16.0
+sniffio==1.3.1
+soundfile==0.12.1
+soupsieve==2.5
+speechbrain==1.0.0
+stack-data==0.6.3
+sympy==1.12
+terminado==0.18.1
+tinycss2==1.2.1
+tokenizers==0.15.2
+tomli==2.0.1
+torch==2.2.2+cu118
+torchaudio==2.2.2+cu118
+torchvision==0.17.2+cu118
+tornado==6.4
+tqdm==4.66.2
+traitlets==5.14.2
+transformers==4.39.3
+types-python-dateutil==2.9.0.20240316
+typing_extensions==4.8.0
+uri-template==1.3.0
+urllib3==2.2.1
+wcwidth==0.2.13
+webcolors==1.13
+webencodings==0.5.1
+websocket-client==1.7.0
+widgetsnbextension==4.0.10
+zipp==3.18.1
+
+
+2024-04-08 20:05:39,086 - speechbrain.utils.superpowers - DEBUG - b725349
+
+
+2024-04-08 20:05:40,033 - speechbrain.dataio.encoder - DEBUG - Would load categorical encoding from ../results/XVector/Augmented_2/1986/save\label_encoder.txt, but file doesn't exist yet.
+2024-04-08 20:05:40,731 - speechbrain.dataio.encoder - INFO - Load called, but CategoricalEncoder is not empty. Loaded data will overwrite everything. This is normal if there is e.g. an unk label defined at init.
+2024-04-08 20:05:40,732 - speechbrain.dataio.encoder - DEBUG - Loaded categorical encoding from ../results/XVector/Augmented_2/1986/save\label_encoder.txt
+2024-04-08 20:05:40,732 - speechbrain.core - INFO - Info: ckpt_interval_minutes arg from hparam file is used
+2024-04-08 20:05:40,869 - speechbrain.core - INFO - Gradscaler enabled: False. Using precision: fp32.
+2024-04-08 20:05:40,870 - speechbrain.core - INFO - 926.3k trainable parameters in SpkIdBrain
+2024-04-08 20:05:40,871 - speechbrain.utils.checkpoints - INFO - Would load a checkpoint here, but none found yet.
+2024-04-08 20:05:40,871 - speechbrain.utils.epoch_loop - INFO - Going into epoch 1
+2024-04-08 20:05:40,882 - speechbrain.dataio.encoder - DEBUG - CategoricalEncoder.expect_len was never called: assuming category count of 5 to be correct! Sanity check your encoder using `.expect_len`. Ensure that downstream code also uses the correct size. If you are sure this does not apply to you, use `.ignore_len`.
+2024-04-08 20:20:41,008 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+20-20-40+00
+2024-04-08 20:35:41,452 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+20-35-41+00
+2024-04-08 20:35:41,457 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+20-20-40+00
+2024-04-08 20:50:41,667 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+20-50-41+00
+2024-04-08 20:50:41,675 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+20-35-41+00
+2024-04-08 20:57:11,960 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.001 to 0.00098
+2024-04-08 20:57:11,961 - speechbrain.utils.train_logger - INFO - Epoch: 1, lr: 1.00e-03 - train loss: 6.51e-01 - valid loss: 6.09e-01, valid error: 2.55e-01
+2024-04-08 20:57:11,987 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+20-57-11+00
+2024-04-08 20:57:11,998 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+20-50-41+00
+2024-04-08 20:57:11,999 - speechbrain.utils.epoch_loop - INFO - Going into epoch 2
+2024-04-08 21:12:12,100 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+21-12-12+00
+2024-04-08 21:27:12,238 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+21-27-12+00
+2024-04-08 21:27:12,257 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+21-12-12+00
+2024-04-08 21:42:12,704 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+21-42-12+00
+2024-04-08 21:42:12,724 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+21-27-12+00
+2024-04-08 21:48:39,417 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00098 to 0.00096
+2024-04-08 21:48:39,417 - speechbrain.utils.train_logger - INFO - Epoch: 2, lr: 9.82e-04 - train loss: 5.92e-01 - valid loss: 6.02e-01, valid error: 2.53e-01
+2024-04-08 21:48:39,442 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+21-48-39+00
+2024-04-08 21:48:39,470 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+21-42-12+00
+2024-04-08 21:48:39,471 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+20-57-11+00
+2024-04-08 21:48:39,471 - speechbrain.utils.epoch_loop - INFO - Going into epoch 3
+2024-04-08 22:03:39,557 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-03-39+00
+2024-04-08 22:18:39,656 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-18-39+00
+2024-04-08 22:18:39,685 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-03-39+00
+2024-04-08 22:33:39,807 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-33-39+00
+2024-04-08 22:33:39,838 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-18-39+00
+2024-04-08 22:40:03,500 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00096 to 0.00094
+2024-04-08 22:40:03,501 - speechbrain.utils.train_logger - INFO - Epoch: 3, lr: 9.63e-04 - train loss: 5.70e-01 - valid loss: 5.62e-01, valid error: 2.33e-01
+2024-04-08 22:40:03,522 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-40-03+00
+2024-04-08 22:40:03,561 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-33-39+00
+2024-04-08 22:40:03,563 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+21-48-39+00
+2024-04-08 22:40:03,563 - speechbrain.utils.epoch_loop - INFO - Going into epoch 4
+2024-04-08 22:55:03,887 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-55-03+00
+2024-04-08 23:10:04,200 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+23-10-04+00
+2024-04-08 23:10:04,241 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-55-03+00
+2024-04-08 23:25:04,653 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+23-25-04+00
+2024-04-08 23:25:04,695 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+23-10-04+00
+2024-04-08 23:31:31,694 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00094 to 0.00093
+2024-04-08 23:31:31,695 - speechbrain.utils.train_logger - INFO - Epoch: 4, lr: 9.45e-04 - train loss: 5.52e-01 - valid loss: 5.81e-01, valid error: 2.43e-01
+2024-04-08 23:31:31,717 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+23-31-31+00
+2024-04-08 23:31:31,766 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+23-25-04+00
+2024-04-08 23:31:31,766 - speechbrain.utils.epoch_loop - INFO - Going into epoch 5
+2024-04-08 23:46:31,928 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+23-46-31+00
+2024-04-09 00:01:32,461 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-09+00-01-32+00
+2024-04-09 00:01:32,526 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+23-46-31+00
+2024-04-09 00:16:32,827 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-09+00-16-32+00
+2024-04-09 00:16:32,895 - speechbrain.utils.checkpoints - DEBUG - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-09+00-01-32+00
+2024-04-09 00:22:56,441 - speechbrain.nnet.schedulers - INFO - Changing lr from 0.00093 to 0.00091
+2024-04-09 00:22:56,441 - speechbrain.utils.train_logger - INFO - Epoch: 5, lr: 9.27e-04 - train loss: 5.38e-01 - valid loss: 5.59e-01, valid error: 2.31e-01
+2024-04-09 00:22:56,465 - speechbrain.utils.checkpoints - INFO - Saved an end-of-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-09+00-22-56+00
+2024-04-09 00:22:56,544 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+22-40-03+00
+2024-04-09 00:22:56,545 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-08+23-31-31+00
+2024-04-09 00:22:56,546 - speechbrain.utils.checkpoints - INFO - Deleted checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-09+00-16-32+00
+2024-04-09 00:22:56,547 - speechbrain.utils.epoch_loop - INFO - Going into epoch 6
+2024-04-09 00:37:56,675 - speechbrain.utils.checkpoints - DEBUG - Saved an intra-epoch checkpoint in ..\results\XVector\Augmented_2\1986\save\CKPT+2024-04-09+00-37-56+00
