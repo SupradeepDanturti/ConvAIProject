@@ -1,5 +1,7 @@
 """
-Custom LibriParty creation script with user specified parameters.
+Script which creates custom dataset based on parameters[dataset.yaml].
+
+Usage - python create_custom_dataset.py --output_folder <output_dir>
 """
 
 import os
