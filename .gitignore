@@ -11,5 +11,3 @@
 .git
 .idea
 data/
-results/selfsupervised/
-results/train_with_wav2vec2/

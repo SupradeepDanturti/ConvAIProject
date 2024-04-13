@@ -1,5 +1,3 @@
-# yamllint disable
-end-of-epoch: true
-error: 0.20328155159950256
-loss: 0.5163448396730131
-unixtime: 1711202405.3626528
+version https://git-lfs.github.com/spec/v1
+oid sha256:dac4c2d23650a3f80bcaeadfa83044abc6219cc112ec5868ec5923caaab4f216
+size 124

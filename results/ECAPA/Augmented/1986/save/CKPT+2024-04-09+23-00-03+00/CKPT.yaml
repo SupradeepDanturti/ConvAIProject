@@ -1,4 +1,3 @@
-# yamllint disable
-brain_intra_epoch_ckpt: true
-end-of-epoch: false
-unixtime: 1712718003.6154268
+version https://git-lfs.github.com/spec/v1
+oid sha256:a2df3c2481e7e277facbe1cb40b46817434ec0379d6272ba29ee455db2c63b73
+size 101

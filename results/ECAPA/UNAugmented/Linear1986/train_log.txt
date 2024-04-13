@@ -1,21 +1,3 @@
-epoch: 1, lr: 1.00e-03 - train loss: 1.51 - valid loss: 1.36, valid ErrorRate: 3.04e-01
-epoch: 2, lr: 9.53e-04 - train loss: 1.19 - valid loss: 1.18, valid ErrorRate: 2.33e-01
-epoch: 3, lr: 9.05e-04 - train loss: 1.13 - valid loss: 1.16, valid ErrorRate: 2.34e-01
-epoch: 4, lr: 8.58e-04 - train loss: 1.09 - valid loss: 1.14, valid ErrorRate: 2.23e-01
-epoch: 5, lr: 8.11e-04 - train loss: 1.05 - valid loss: 1.11, valid ErrorRate: 2.18e-01
-epoch: 6, lr: 7.63e-04 - train loss: 1.02 - valid loss: 1.10, valid ErrorRate: 2.12e-01
-epoch: 7, lr: 7.16e-04 - train loss: 9.93e-01 - valid loss: 1.11, valid ErrorRate: 2.15e-01
-epoch: 8, lr: 6.68e-04 - train loss: 9.66e-01 - valid loss: 1.08, valid ErrorRate: 2.12e-01
-epoch: 9, lr: 6.21e-04 - train loss: 9.43e-01 - valid loss: 1.08, valid ErrorRate: 2.14e-01
-epoch: 10, lr: 5.74e-04 - train loss: 9.14e-01 - valid loss: 1.08, valid ErrorRate: 2.21e-01
-epoch: 11, lr: 5.26e-04 - train loss: 8.84e-01 - valid loss: 1.09, valid ErrorRate: 2.13e-01
-epoch: 12, lr: 4.79e-04 - train loss: 8.54e-01 - valid loss: 1.11, valid ErrorRate: 2.24e-01
-epoch: 13, lr: 4.32e-04 - train loss: 8.25e-01 - valid loss: 1.12, valid ErrorRate: 2.26e-01
-epoch: 14, lr: 3.84e-04 - train loss: 7.93e-01 - valid loss: 1.12, valid ErrorRate: 2.32e-01
-epoch: 15, lr: 3.37e-04 - train loss: 7.62e-01 - valid loss: 1.15, valid ErrorRate: 2.24e-01
-epoch: 16, lr: 2.89e-04 - train loss: 7.32e-01 - valid loss: 1.15, valid ErrorRate: 2.38e-01
-epoch: 17, lr: 2.42e-04 - train loss: 7.02e-01 - valid loss: 1.20, valid ErrorRate: 2.71e-01
-epoch: 18, lr: 1.95e-04 - train loss: 6.73e-01 - valid loss: 1.26, valid ErrorRate: 2.55e-01
-epoch: 19, lr: 1.47e-04 - train loss: 6.44e-01 - valid loss: 1.36, valid ErrorRate: 2.49e-01
-epoch: 20, lr: 1.00e-04 - train loss: 6.17e-01 - valid loss: 1.40, valid ErrorRate: 2.55e-01
-Epoch loaded: 20 - test loss: 1.50, test ErrorRate: 2.63e-01
+version https://git-lfs.github.com/spec/v1
+oid sha256:d32d817db2dfee53674b69468eb6ce51c81f6464cc820e14b625ff47aba149b6
+size 1909
