@@ -1,0 +1,69 @@
+
+sample_rate: 16000
+sslmodel_hub: facebook/wav2vec2-base
+sslmodel_folder: /content/ssl_checkpoint
+
+freeze_ssl: False
+freeze_ssl_conv: True
+
+encoder_dim: 768
+emb_dim: 128
+out_n_neurons: 5
+
+label_encoder: !new:speechbrain.dataio.encoder.CategoricalEncoder
+ssl_model: !new:speechbrain.lobes.models.huggingface_transformers.wav2vec2.Wav2Vec2
+    source: !ref <sslmodel_hub>
+    output_norm: True
+    freeze: !ref <freeze_ssl>
+    freeze_feature_extractor: !ref <freeze_ssl_conv>
+    save_path: !ref <sslmodel_folder>
+
+avg_pool: !new:speechbrain.nnet.pooling.StatisticsPooling
+    return_std: False
+
+# Mean and std normalization of the input features
+mean_var_norm: !new:speechbrain.processing.features.InputNormalization
+    norm_type: sentence
+    std_norm: False
+
+embedding_model: !new:speechbrain.lobes.models.Xvector.Xvector
+    in_channels: !ref <encoder_dim>
+    activation: !name:torch.nn.LeakyReLU
+    tdnn_blocks: 3
+    tdnn_channels: [ 64, 64, 64 ]
+    tdnn_kernel_sizes: [ 5, 2, 3 ]
+    tdnn_dilations: [ 1, 2, 3 ]
+    lin_neurons: !ref <emb_dim>
+
+classifier: !new:speechbrain.lobes.models.Xvector.Classifier
+    input_shape: [null, null, !ref <emb_dim>]
+    activation: !name:torch.nn.LeakyReLU
+    lin_blocks: 1
+    lin_neurons: !ref <emb_dim>
+    out_neurons: !ref <out_n_neurons>
+
+modules:
+    ssl_model: !ref <ssl_model>
+    mean_var_norm: !ref <mean_var_norm>
+    embedding_model:  !ref <embedding_model>
+    classifier: !ref <classifier>
+
+model: !new:torch.nn.ModuleList
+    - [!ref <embedding_model>, !ref <classifier>]
+
+
+pretrained_path: /content/
+       
+pretrainer: !new:speechbrain.utils.parameter_transfer.Pretrainer
+  loadables:
+      embedding_model: !ref <embedding_model>
+      classifier: !ref <classifier>
+      ssl_model: !ref <ssl_model>
+      model: !ref <model>
+      label_encoder: !ref <label_encoder>
+  paths:
+      embedding_model: !ref <pretrained_path>/embedding_model.ckpt
+      classifier: !ref <pretrained_path>/classifier.ckpt
+      ssl_model: !ref <pretrained_path>/ssl_model.ckpt
+      model: !ref <pretrained_path>/model.ckpt
+      label_encoder: !ref <pretrained_path>/label_encoder.txt      

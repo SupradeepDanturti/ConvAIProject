@@ -1,0 +1,21 @@
+Epoch: 1, lr: 1.00e-03 - train loss: 1.51 - valid loss: 1.36, valid error_rate: 3.04e-01
+Epoch: 2, lr: 9.53e-04 - train loss: 1.19 - valid loss: 1.18, valid error_rate: 2.33e-01
+Epoch: 3, lr: 9.05e-04 - train loss: 1.13 - valid loss: 1.16, valid error_rate: 2.34e-01
+Epoch: 4, lr: 8.58e-04 - train loss: 1.09 - valid loss: 1.14, valid error_rate: 2.23e-01
+Epoch: 5, lr: 8.11e-04 - train loss: 1.05 - valid loss: 1.11, valid error_rate: 2.18e-01
+Epoch: 6, lr: 7.63e-04 - train loss: 1.02 - valid loss: 1.10, valid error_rate: 2.12e-01
+Epoch: 7, lr: 7.16e-04 - train loss: 9.93e-01 - valid loss: 1.11, valid error_rate: 2.15e-01
+Epoch: 8, lr: 6.68e-04 - train loss: 9.66e-01 - valid loss: 1.08, valid error_rate: 2.12e-01
+Epoch: 9, lr: 6.21e-04 - train loss: 9.43e-01 - valid loss: 1.08, valid error_rate: 2.14e-01
+Epoch: 10, lr: 5.74e-04 - train loss: 9.14e-01 - valid loss: 1.08, valid error_rate: 2.21e-01
+Epoch: 11, lr: 5.26e-04 - train loss: 8.84e-01 - valid loss: 1.09, valid error_rate: 2.13e-01
+Epoch: 12, lr: 4.79e-04 - train loss: 8.54e-01 - valid loss: 1.11, valid error_rate: 2.24e-01
+Epoch: 13, lr: 4.32e-04 - train loss: 8.25e-01 - valid loss: 1.12, valid error_rate: 2.26e-01
+Epoch: 14, lr: 3.84e-04 - train loss: 7.93e-01 - valid loss: 1.12, valid error_rate: 2.32e-01
+Epoch: 15, lr: 3.37e-04 - train loss: 7.62e-01 - valid loss: 1.15, valid error_rate: 2.24e-01
+Epoch: 16, lr: 2.89e-04 - train loss: 7.32e-01 - valid loss: 1.15, valid error_rate: 2.38e-01
+Epoch: 17, lr: 2.42e-04 - train loss: 7.02e-01 - valid loss: 1.20, valid error_rate: 2.71e-01
+Epoch: 18, lr: 1.95e-04 - train loss: 6.73e-01 - valid loss: 1.26, valid error_rate: 2.55e-01
+Epoch: 19, lr: 1.47e-04 - train loss: 6.44e-01 - valid loss: 1.36, valid error_rate: 2.49e-01
+Epoch: 20, lr: 1.00e-04 - train loss: 6.17e-01 - valid loss: 1.40, valid error_rate: 2.55e-01
+Epoch loaded: 20 - test loss: 1.50, test error_rate: 2.63e-01
