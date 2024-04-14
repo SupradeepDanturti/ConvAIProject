@@ -20,6 +20,12 @@ sslmodel_folder: !ref <save_folder>/ssl_checkpoint
 train_annotation: !ref <data_folder>/train_data.json
 valid_annotation: !ref <data_folder>/valid_data.json
 test_annotation: !ref <data_folder>/test_data.json
+test_annotation_0_spk: !ref <data_folder>/test_files_no_spk_data.json
+test_annotation_1_spk: !ref <data_folder>/test_files_1_spk_data.json
+test_annotation_2_spk: !ref <data_folder>/test_files_2_spk_data.json
+test_annotation_3_spk: !ref <data_folder>/test_files_3_spk_data.json
+test_annotation_4_spk: !ref <data_folder>/test_files_4_spk_data.json
+
 
 # The train logger writes training statistics to a file, as well as stdout.
 train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger

@@ -20,6 +20,11 @@ data_folder: ../data  # e.g., /path/to/IEMOCAP_full_release
 train_annotation: !ref <data_folder>/train_data.json
 valid_annotation: !ref <data_folder>/valid_data.json
 test_annotation: !ref <data_folder>/test_data.json
+test_annotation_0_spk: !ref <data_folder>/test_files_no_spk_data.json
+test_annotation_1_spk: !ref <data_folder>/test_files_1_spk_data.json
+test_annotation_2_spk: !ref <data_folder>/test_files_2_spk_data.json
+test_annotation_3_spk: !ref <data_folder>/test_files_3_spk_data.json
+test_annotation_4_spk: !ref <data_folder>/test_files_4_spk_data.json
 
 # The train logger writes training statistics to a file, as well as stdout.
 train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
@@ -27,8 +32,8 @@ train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
 
 
 ####################### Training Parameters ####################################
-number_of_epochs: 5
-batch_size: 32
+number_of_epochs: 15
+batch_size: 128
 lr: 0.001
 lr_final: 0.0001
 lr_ssl: 0.00001
@@ -40,7 +45,7 @@ freeze_ssl_conv: True
 
 ####################### Model Parameters #######################################
 encoder_dim: 768
-emb_dim: 64
+emb_dim: 128
 out_n_neurons: 5
 
 
@@ -70,9 +75,9 @@ embedding_model: !new:speechbrain.lobes.models.Xvector.Xvector
     in_channels: !ref <encoder_dim>
     activation: !name:torch.nn.LeakyReLU
     tdnn_blocks: 3
-    tdnn_channels: [64, 64, 128]
-    tdnn_kernel_sizes: [5, 2, 1]
-    tdnn_dilations: [1, 2, 1]
+    tdnn_channels: [ 64, 64, 64 ]
+    tdnn_kernel_sizes: [ 5, 2, 3 ]
+    tdnn_dilations: [ 1, 2, 3 ]
     lin_neurons: !ref <emb_dim>
 
 classifier: !new:speechbrain.lobes.models.Xvector.Classifier

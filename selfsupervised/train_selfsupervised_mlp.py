@@ -178,7 +178,12 @@ def dataio_prep(hparams):
     data_info = {
         "train": hparams["train_annotation"],
         "valid": hparams["valid_annotation"],
-        "test": hparams["test_annotation"],
+        # "test": hparams["test_annotation"],
+        "test_annotation_0_spk": hparams["test_annotation_0_spk"],
+        "test_annotation_1_spk": hparams["test_annotation_1_spk"],
+        "test_annotation_2_spk": hparams["test_annotation_2_spk"],
+        "test_annotation_3_spk": hparams["test_annotation_3_spk"],
+        "test_annotation_4_spk": hparams["test_annotation_4_spk"],
     }
     for dataset in data_info:
         datasets[dataset] = sb.dataio.dataset.DynamicItemDataset.from_json(
@@ -247,9 +252,45 @@ if __name__ == "__main__":
         valid_loader_kwargs=hparams["dataloader_options"],
     )
 
-    # Load the best checkpoint for evaluation
+    # # Load the best checkpoint for evaluation
+    # print("Evaluating on all classes")
+    # test_stats = num_speaker_brain.evaluate(
+    #     test_set=datasets["test"],
+    #     min_key="error_rate",
+    #     test_loader_kwargs=hparams["dataloader_options"],
+    # )
+
+    print("Evaluating on no spk class")
     test_stats = num_speaker_brain.evaluate(
-        test_set=datasets["test"],
+        test_set=datasets["test_annotation_0_spk"],
+        min_key="error_rate",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+
+    print("Evaluating on 1 spk class")
+    test_stats = num_speaker_brain.evaluate(
+        test_set=datasets["test_annotation_1_spk"],
+        min_key="error_rate",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+
+    print("Evaluating on 2 spk class")
+    test_stats = num_speaker_brain.evaluate(
+        test_set=datasets["test_annotation_2_spk"],
+        min_key="error_rate",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+
+    print("Evaluating on 3 spk class")
+    test_stats = num_speaker_brain.evaluate(
+        test_set=datasets["test_annotation_3_spk"],
+        min_key="error_rate",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+
+    print("Evaluating on 4 spk class")
+    test_stats = num_speaker_brain.evaluate(
+        test_set=datasets["test_annotation_4_spk"],
         min_key="error_rate",
         test_loader_kwargs=hparams["dataloader_options"],
     )

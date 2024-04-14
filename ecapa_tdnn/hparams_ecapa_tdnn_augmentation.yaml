@@ -1,3 +1,4 @@
+
 # Basic configuration for reproducibility
 seed: 1986
 __set_seed: !!python/object/apply:torch.manual_seed [!ref <seed>]
@@ -22,8 +23,8 @@ rir_annotation: !ref <data_folder>/simulated_rirs.csv
 
 # Training parameters
 sample_rate: 16000
-number_of_epochs: 50
-batch_size: 128
+number_of_epochs: 20
+batch_size: 64
 lr_start: 0.001
 lr_final: 0.0001
 weight_decay: 0.00002
@@ -32,13 +33,13 @@ n_classes: 5
 dim: 192
 num_attention_channels: 128
 shuffle: True
-# 
-# lr: 0.0001
-# mode: exp_range
-# gamma: 0.9998
-# base_lr: 0.000001
-# max_lr: !ref <lr>
-# step_size: 396
+
+lr: 0.0001
+mode: exp_range
+gamma: 0.9998
+base_lr: 0.000001
+max_lr: !ref <lr>
+step_size: 396
 
 dataloader_options:
     batch_size: !ref <batch_size>
@@ -93,6 +94,18 @@ drop_freq: !new:speechbrain.augment.time_domain.DropFreq
     drop_freq_count_high: !ref <drop_freq_count_high>
     drop_freq_width: !ref <drop_freq_width>
 
+# Time drop: randomly drops a number of temporal chunks.
+drop_chunk_count_low: 1  # Min number of audio chunks to drop
+drop_chunk_count_high: 5  # Max number of audio chunks to drop
+drop_chunk_length_low: 1000  # Min length of audio chunks to drop
+drop_chunk_length_high: 2000  # Max length of audio chunks to drop
+
+drop_chunk: !new:speechbrain.augment.time_domain.DropChunk
+    drop_length_low: !ref <drop_chunk_length_low>
+    drop_length_high: !ref <drop_chunk_length_high>
+    drop_count_low: !ref <drop_chunk_count_low>
+    drop_count_high: !ref <drop_chunk_count_high>
+
 wav_augment: !new:speechbrain.augment.augmenter.Augmenter
     parallel_augment: False
     concat_original: True
@@ -102,8 +115,10 @@ wav_augment: !new:speechbrain.augment.augmenter.Augmenter
     max_augmentations: 4
     augment_prob: 1.0
     augmentations: [
+        !ref <add_noise>,
         !ref <speed_perturb>,
-        !ref <drop_freq>]
+        !ref <drop_freq>,
+        !ref <drop_chunk>]
 
 # Feature extraction
 compute_features: !new:speechbrain.lobes.features.Fbank
@@ -151,10 +166,11 @@ opt_class: !name:torch.optim.Adam
     weight_decay: !ref <weight_decay>
 
 # Learning rate scheduling
-lr_annealing: !new:speechbrain.nnet.schedulers.LinearScheduler
-    initial_value: !ref <lr_start>
-    final_value: !ref <lr_final>
-    epoch_count: !ref <number_of_epochs>
+        
+lr_annealing: !new:speechbrain.nnet.schedulers.CyclicLRScheduler
+    base_lr: !ref <base_lr>
+    max_lr: !ref <max_lr>
+    step_size: !ref <step_size>
 
 # Logging
 train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
