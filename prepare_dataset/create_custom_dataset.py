@@ -1,7 +1,7 @@
 """
-Script which creates custom dataset based on parameters[dataset.yaml].
+Script which creates custom dataset based on set parameters[dataset.yaml].
 
-Usage - python create_custom_dataset.py --output_folder <output_dir>
+Usage - python create_custom_dataset.py dataset.yaml
 """
 
 import os
@@ -70,6 +70,7 @@ def parse_libri_folder(libri_folders):
 
     return speakers, words_dict
 
+
 os.makedirs(os.path.join(params["out_folder"], "metadata"), exist_ok=True)
 
 # we generate metadata for each split
@@ -88,7 +89,6 @@ for indx, split in enumerate(["train", "dev", "eval"]):
     )
 
 # from metadata we generate the actual mixtures
-
 for indx, split in enumerate(["train", "dev", "eval"]):
     print(f"Creating {split} set")
     # load metadata
@@ -101,19 +101,18 @@ for indx, split in enumerate(["train", "dev", "eval"]):
 
     # Here we loop through sessions with progress tracking
     for sess in tqdm(list(c_meta.keys()), desc=f"Creating {split} set"):
-        # print(c_meta[sess])
         create_mixture(sess, c_folder, params, c_meta)
 
 print("Creating segments....")
 
 
 def create_segments(x="train"):
-    segment_length = 2  # seconds
-    sample_rate = 16000
+    segment_length = params["max_length"] / 60  # in seconds
+    sample_rate = params["samplerate"]
     file_list = get_all_files((os.path.join(params["out_folder"], f"{x}")), match_and=[".wav"])
 
     for file in tqdm(file_list, desc=f"Processing {x} segments"):
-        wav_path = file.replace("\\", "/")
+        wav_path = file.replace("\\", "/")  # Windows can be removed if you're using linux
 
         waveform, _ = torchaudio.load(wav_path)
         num_samples_per_segment = sample_rate * segment_length
@@ -135,17 +134,22 @@ create_segments("dev")
 create_segments("eval")
 print("Adding Noise....")
 
+"""
+Writes all the noises into a csv and creates noisifier and reverber objects
+"""
+
 rir_audios = get_all_files(os.path.join(params["rirs_noises_root"], "simulated_rirs"), match_and=['.wav'])
 rir_audios.extend(
     get_all_files(os.path.join(params["rirs_noises_root"], "real_rirs_isotropic_noises"), match_and=['.wav']))
+
 noise_audios = get_all_files(os.path.join(params["rirs_noises_root"], "pointsource_noises"), match_and=['.wav'])
 
 write_csv(rir_audios, os.path.join(params["out_folder"], "simulated_rirs.csv"))
 write_csv(noise_audios, os.path.join(params["out_folder"], "noises.csv"))
 
 noisifier = AddNoise(os.path.join(params["out_folder"], "noises.csv"), snr_low=5, snr_high=20)
-reverber = AddReverb(os.path.join(params["out_folder"], "simulated_rirs.csv"), reverb_sample_rate=16000,
-                     clean_sample_rate=16000)
+reverber = AddReverb(os.path.join(params["out_folder"], "simulated_rirs.csv"), reverb_sample_rate=params["samplerate"],
+                     clean_sample_rate=params["samplerate"])
 
 batch_size = 10
 probability_noise = 0.5
@@ -153,11 +157,9 @@ probability_reverb = 0.5
 
 
 def load_and_addnoise(x="train"):
-    # with open(f'{x}_data.json', 'r') as f:
-    #     data = json.load(f)
     json_data = get_all_files((os.path.join(params["out_folder"], f"{x}")), match_and=[".wav"])
     for data in tqdm(json_data, desc=f'Loading {x}'):
-        audio_path = data.replace("\\", "/")
+        audio_path = data.replace("\\", "/")  # Windows can be removed if you're using linux
         signal = read_audio(audio_path)
         clean = signal.unsqueeze(0)
 
@@ -177,7 +179,7 @@ def load_and_addnoise(x="train"):
         processed_audio = reverbed.squeeze(0).transpose(0, 1)
         output_path = audio_path
 
-        torchaudio.save(output_path, processed_audio, 16000)
+        torchaudio.save(output_path, processed_audio, params["samplerate"])
 
 
 load_and_addnoise("train")

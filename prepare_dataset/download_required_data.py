@@ -1,13 +1,15 @@
 """
-Script to download datasets for SpeakerCounter.
+This script will download datasets for SpeakerCounter and extracts the required data into the specified folder.
+[Librispeech Clean-100,dev-clean,test-clean,RIRS-noises]
+
+usage: python download_required_data.py --output_folder <destination_folder_path>
 """
 
 import argparse
 import os
 import tarfile
-import speechbrain
+
 from speechbrain.utils.data_utils import download_file
-from local.resample_folder import resample_folder
 
 
 def extract_tar_gz(file_path, output_path):
@@ -15,7 +17,7 @@ def extract_tar_gz(file_path, output_path):
     if file_path.endswith(".tar.gz"):
         with tarfile.open(file_path, "r:gz") as tar:
             tar.extractall(path=output_path)
-        os.remove(file_path)  # Optionally remove the .tar.gz file after extraction
+        os.remove(file_path)  # remove the .tar.gz file after extraction
 
 
 LIBRISPEECH_URLS = [
