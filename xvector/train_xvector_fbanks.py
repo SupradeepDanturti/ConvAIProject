@@ -1,88 +1,96 @@
-# Your code here
 
-#!/usr/bin/env python3
-"Recipe for training a spk classification system."
 import os
 import sys
-import torch
-import torchaudio
 import speechbrain as sb
 from hyperpyyaml import load_hyperpyyaml
+from speechbrain.utils import hpopt as hp
+import torchaudio
 
 
-# Brain class for speech enhancement training
-class DigitBrain(sb.Brain):
-    """Class that manages the training loop. See speechbrain.core.Brain."""
+class XVectorSpkCounter(sb.Brain):
+    """
+    A custom Brain class for training and evaluating a speaker counting model.
+    This class is designed to handle the forward pass, loss computation, and
+    the training and validation cycles, leveraging SpeechBrain's workflow.
+    """
 
     def compute_forward(self, batch, stage):
-        """Runs all the computations that transforms the input into the
-        output probabilities over the N classes.
-
-        Arguments
-        ---------
-        batch : PaddedBatch
-            This batch object contains all the relevant tensors for computation.
-        stage : sb.Stage
-            One of sb.Stage.TRAIN, sb.Stage.VALID, or sb.Stage.TEST.
-        Returns
-        -------
-        predictions : Tensor
-            Tensor that contains the posterior probabilities over the N classes.
         """
-        # Your code here. Aim for 7-8 lines
+        Processes the input batch to produce model predictions.
+
+        Parameters:
+        - batch (PaddedBatch): Contains all tensors needed for computation.
+        - stage (sb.Stage): The stage of the pipeline (TRAIN, VALID, or TEST).
+
+        Returns:
+        - Tensor: Posterior probabilities over the number of classes.
+        """
+
         batch = batch.to(self.device)
-        wavs, lens = batch.sig
-        feats = self.modules.compute_features(wavs)
-        feats = self.modules.mean_var_norm(feats, lens)
+        feats, lens = self.prepare_features(batch.sig, stage)
         embeddings = self.modules.embedding_model(feats, lens)
         predictions = self.modules.classifier(embeddings)
 
         return predictions
 
+    def prepare_features(self, wavs, stage):
+        """
+        Prepares the signal features for model computation, applying
+        waveform augmentation and feature extraction.
 
-    def compute_objectives(self, predictions, batch, stage):
-        """Computes the loss given the predicted and targeted outputs.
+        Parameters:
+        - wavs (tuple): Tuple of signals and their lengths.
+        - stage (sb.Stage): Current training stage.
 
-        Arguments
-        ---------
-        predictions : tensor
-            The output tensor from `compute_forward`.
-        batch : PaddedBatch
-            This batch object contains all the relevant tensors for computation.
-        stage : sb.Stage
-            One of sb.Stage.TRAIN, sb.Stage.VALID, or sb.Stage.TEST.
-        Returns
-        -------
-        loss : torch.Tensor
-            A one-element tensor used for backpropagating the gradient.
+        Returns:
+        - Tuple[Tensor, Tensor]: Features and their lengths.
         """
 
-        # Your code here. Aim for 7-8 lines
-        _, lens = batch['sig']
-        num_speakers_encoded = batch["num_speakers_encoded"].data
+        wavs, lens = wavs
 
-        loss = sb.nnet.losses.nll_loss(predictions, num_speakers_encoded, lens)
+        # Feature extraction and normalization
+        feats = self.modules.compute_features(wavs)
+        feats = self.modules.mean_var_norm(feats, lens)
+
+        return feats, lens
+
+    def compute_objectives(self, predictions, batch, stage):
+        """
+        Computes the loss given predictions and targets.
+
+        Parameters:
+        - predictions (Tensor): Model predictions.
+        - batch (PaddedBatch): Batch providing the targets.
+        - stage (sb.Stage): The training stage.
+
+        Returns:
+        - Tensor: The loss tensor.
+        """
+
+        _, lens = batch.sig
+        spks, _ = batch.num_speakers_encoded
+        
+        # Compute the cost function
+        loss = sb.nnet.losses.nll_loss(predictions, spks, lens)
+
         self.loss_metric.append(
-            batch.id, predictions, num_speakers_encoded, lens, reduction="batch"
+            batch.id, predictions, spks, lens, reduction="batch"
         )
 
-        # Compute classification error at test time
         if stage != sb.Stage.TRAIN:
-            self.error_metrics.append(batch.id, predictions, num_speakers_encoded, lens)
+            self.error_metrics.append(batch.id, predictions, spks, lens)
+
         return loss
 
     def on_stage_start(self, stage, epoch=None):
-        """Gets called at the beginning of each epoch.
-        Arguments
-        ---------
-        stage : sb.Stage
-            One of sb.Stage.TRAIN, sb.Stage.VALID, or sb.Stage.TEST.
-        epoch : int
-            The currently-starting epoch. This is passed
-            `None` during the test stage.
+        """
+        Initializes trackers at the beginning of each stage.
+
+        Parameters:
+        - stage (sb.Stage): Current stage.
+        - epoch (int, optional): Current epoch number.
         """
 
-        # Set up statistics trackers for this stage
         self.loss_metric = sb.utils.metric_stats.MetricStats(
             metric=sb.nnet.losses.nll_loss
         )
@@ -92,16 +100,13 @@ class DigitBrain(sb.Brain):
             self.error_metrics = self.hparams.error_stats()
 
     def on_stage_end(self, stage, stage_loss, epoch=None):
-        """Gets called at the end of an epoch.
-        Arguments
-        ---------
-        stage : sb.Stage
-            One of sb.Stage.TRAIN, sb.Stage.VALID, sb.Stage.TEST
-        stage_loss : float
-            The average loss for all of the data processed in this stage.
-        epoch : int
-            The currently-starting epoch. This is passed
-            `None` during the test stage.
+        """
+        Handles logging and learning rate adjustments at the end of each stage.
+
+        Parameters:
+        - stage (sb.Stage): Current stage.
+        - stage_loss (float): Average loss of the stage.
+        - epoch (int, optional): Current epoch number.
         """
 
         # Store the train loss until the validation stage.
@@ -115,7 +120,6 @@ class DigitBrain(sb.Brain):
                 "error": self.error_metrics.summarize("average"),
             }
 
-        # At the end of validation...
         if stage == sb.Stage.VALID:
 
             old_lr, new_lr = self.hparams.lr_annealing(epoch)
@@ -129,7 +133,11 @@ class DigitBrain(sb.Brain):
             )
 
             # Save the current checkpoint and delete previous checkpoints,
-            self.checkpointer.save_and_keep_only(meta=stats, min_keys=["error"])
+            if self.hparams.ckpt_enable:
+                self.checkpointer.save_and_keep_only(
+                    meta=stats, min_keys=["error"]
+                )
+            hp.report_result(stats)
 
         # We also write statistics about test data to stdout and to the logfile.
         if stage == sb.Stage.TEST:
@@ -140,34 +148,28 @@ class DigitBrain(sb.Brain):
 
 
 def dataio_prep(hparams):
-    """This function prepares the datasets to be used in the brain class.
-    It also defines the data processing pipeline through user-defined functions.
-    We expect `prepare_mini_librispeech` to have been called before this,
-    so that the `train.json`, `valid.json`,  and `valid.json` manifest files
-    are available.
-    Arguments
-    ---------
-    hparams : dict
-        This dictionary is loaded from the `train.yaml` file, and it includes
-        all the hyperparameters needed for dataset construction and loading.
-    Returns
-    -------
-    datasets : dict
-        Contains two keys, "train" and "valid" that correspond
-        to the appropriate DynamicItemDataset object.
+    """
+    Prepares and returns datasets for training, validation, and testing.
+    Parameters:
+    - hparams (dict): A dictionary of hyperparameters for data preparation.
+    Returns:
+    - datasets (dict): A dictionary containing 'train', 'valid', and 'test' datasets.
     """
 
-    # Initialization of the label encoder. The label encoder assigns to each
-    # of the observed label a unique index (e.g, 'digit0': 0, 'digit1': 1, ..)
+    # Initialization of the label encoder.
     label_encoder = sb.dataio.encoder.CategoricalEncoder()
-    print(label_encoder)
 
     # Define audio pipeline
     @sb.utils.data_pipeline.takes("wav_path")
     @sb.utils.data_pipeline.provides("sig")
     def audio_pipeline(wav_path):
-        """Load the signal, and pass it and its length to the corruption class.
-        This is done on the CPU in the `collate_fn`."""
+        """
+        Audio processing pipeline that loads and returns an audio signal.
+        Parameters:
+            - wav_path (str): Path to the audio file.
+        Returns:
+            - sig (Tensor): Loaded audio signal tensor.
+        """
         sig, fs = torchaudio.load(wav_path)
 
         # Resampling
@@ -178,9 +180,15 @@ def dataio_prep(hparams):
     @sb.utils.data_pipeline.takes("num_speakers")
     @sb.utils.data_pipeline.provides("num_speakers", "num_speakers_encoded")
     def label_pipeline(num_speakers):
-        """Defines the pipeline to process the spk labels.
-        Note that we have to assign a different integer to each class
-        through the label encoder.
+        """
+        Processes and encodes the number of speakers.
+
+        Parameters:
+        - num_speakers (int): The number of speakers in the audio.
+
+        Yields:
+        - num_speakers (int): The original number of speakers.
+        - num_speakers_encoded (Tensor): Encoded tensor of the number of speakers.
         """
         yield num_speakers
         num_speakers_encoded = label_encoder.encode_label_torch(num_speakers)
@@ -198,13 +206,11 @@ def dataio_prep(hparams):
     for dataset in data_info:
         datasets[dataset] = sb.dataio.dataset.DynamicItemDataset.from_json(
             json_path=data_info[dataset],
+            replacements={"data_root": hparams["data_folder"]},
             dynamic_items=[audio_pipeline, label_pipeline],
             output_keys=["id", "sig", "num_speakers_encoded"],
         )
 
-    # Load or compute the label encoder (with multi-GPU DDP support)
-    # Please, take a look into the lab_enc_file to see the label to index
-    # mapping.
     lab_enc_file = os.path.join(hparams["save_folder"], "label_encoder.txt")
     label_encoder.load_or_create(
         path=lab_enc_file,
@@ -215,50 +221,51 @@ def dataio_prep(hparams):
     return datasets
 
 
-# Recipe begins!
+# RECIPE BEGINS!
 if __name__ == "__main__":
 
-    # Reading command line arguments.
-    hparams_file, run_opts, overrides = sb.parse_arguments(sys.argv[1:])
+    with hp.hyperparameter_optimization(objective_key="error") as hp_ctx:
 
-    # Load hyperparameters file with command-line overrides.
-    with open(hparams_file) as fin:
-        hparams = load_hyperpyyaml(fin,  overrides)
+        # Reading command line arguments
+        hparams_file, run_opts, overrides = hp_ctx.parse_arguments(
+            sys.argv[1:], pass_trial_id=False
+        )
 
-    # Create experiment directory
-    sb.create_experiment_directory(
-        experiment_directory=hparams["output_folder"],
-        hyperparams_to_save=hparams_file,
-        overrides=overrides,
-    )
+        # Load hyperparameters file with command-line overrides.
+        with open(hparams_file) as fin:
+            hparams = load_hyperpyyaml(fin, overrides)
 
-    # Create dataset objects "train", "valid", and "test".
-    datasets = dataio_prep(hparams)
+        # Create experiment directory
+        sb.create_experiment_directory(
+            experiment_directory=hparams["output_folder"],
+            hyperparams_to_save=hparams_file,
+            overrides=overrides,
+        )
 
-    # Initialize the Brain object to prepare for mask training.
-    digit_brain = DigitBrain(
-        modules=hparams["modules"],
-        opt_class=hparams["opt_class"],
-        hparams=hparams,
-        run_opts=run_opts,
-        checkpointer=hparams["checkpointer"],
-    )
+        # Create dataset objects "train", "valid", and "test".
+        datasets = dataio_prep(hparams)
 
-    # The `fit()` method iterates the training loop, calling the methods
-    # necessary to update the parameters of the model. Since all objects
-    # with changing state are managed by the Checkpointer, training can be
-    # stopped at any point, and will be resumed on next call.
-    digit_brain.fit(
-        epoch_counter=digit_brain.hparams.epoch_counter,
-        train_set=datasets["train"],
-        valid_set=datasets["valid"],
-        train_loader_kwargs=hparams["dataloader_options"],
-        valid_loader_kwargs=hparams["dataloader_options"],
-    )
+        # Initialize the Brain object to prepare for mask training.
+        spk_counter = XVectorSpkCounter(
+            modules=hparams["modules"],
+            opt_class=hparams["opt_class"],
+            hparams=hparams,
+            run_opts=run_opts,
+            checkpointer=hparams["checkpointer"],
+        )
 
-    # Load the best checkpoint for evaluation
-    test_stats = digit_brain.evaluate(
-        test_set=datasets["test"],
-        min_key="error",
-        test_loader_kwargs=hparams["dataloader_options"],
-    )
+        spk_counter.fit(
+            epoch_counter=spk_counter.hparams.epoch_counter,
+            train_set=datasets["train"],
+            valid_set=datasets["valid"],
+            train_loader_kwargs=hparams["dataloader_options"],
+            valid_loader_kwargs=hparams["dataloader_options"],
+        )
+        if not hp_ctx.enabled:
+            # Load the best checkpoint for evaluation
+            test_stats = spk_counter.evaluate(
+                test_set=datasets["test"],
+                min_key="error",
+                test_loader_kwargs=hparams["dataloader_options"],
+            )
+
