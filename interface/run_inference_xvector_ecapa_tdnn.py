@@ -1,8 +1,3 @@
-from SpeakerCounter import SpeakerCounter
-wav_path = "./sample_audio1.wav"
-save_dir = "./sample_inference_run2/"
-model_path = "./xvector" # ./ecapa_tdnn
-
-audio_classifier = SpeakerCounter.from_hparams(source=model_path, savedir=save_dir)
-
-audio_classifier.classify_file(wav_path)
+version https://git-lfs.github.com/spec/v1
+oid sha256:8e877783b6e14488775a089fa8703469f8f841324fbb29bfd0be563b337a00b3
+size 286
