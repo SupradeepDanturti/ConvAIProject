@@ -1,0 +1,48 @@
+#Feature parameters
+sample_rate: 16000
+n_mels: 40
+
+#Model parameters
+emb_dim: 128
+n_classes: 5
+tdnn_channels: 64
+tdnn_channels_out: 128
+
+#model
+compute_features: !new:speechbrain.lobes.features.Fbank
+    n_mels: !ref <n_mels>
+
+mean_var_norm: !new:speechbrain.processing.features.InputNormalization
+    norm_type: sentence
+    std_norm: False
+
+embedding_model: !new:speechbrain.lobes.models.Xvector.Xvector
+    input_size: !ref <n_mels>
+    tdnn_blocks: 5
+    tdnn_channels:
+        - !ref <tdnn_channels>
+        - !ref <tdnn_channels>
+        - !ref <tdnn_channels>
+        - !ref <tdnn_channels>
+        - !ref <tdnn_channels_out>
+    kernel_sizes: [5, 3, 3, 3, 1]
+    dilations: [1, 2, 3, 4, 1]
+    lin_neurons: !ref <emb_dim>
+
+classifier: !new:speechbrain.lobes.models.Xvector.Classifier
+    input_shape: [null, null, !ref <emb_dim>]
+    activation: !name:torch.nn.LeakyReLU
+    lin_blocks: 1
+    lin_neurons: !ref <emb_dim>
+    out_neurons: !ref <n_classes>
+
+modules:
+    compute_features: !ref <compute_features>
+    embedding_model: !ref <embedding_model>
+    classifier: !ref <classifier>
+    mean_var_norm: !ref <mean_var_norm>
+
+pretrainer: !new:speechbrain.utils.parameter_transfer.Pretrainer
+    loadables:
+        embedding_model: !ref <embedding_model>
+        classifier: !ref <classifier>
