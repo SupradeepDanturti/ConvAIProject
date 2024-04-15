@@ -1,61 +1,54 @@
 
-# Your code here
-# Seed needs to be set at top of yaml, before objects with parameters are made
+# Seed for reproducibility of results. Must be set before initializing model components that depend on randomness.
 seed: 1986
 __set_seed: !apply:torch.manual_seed [!ref <seed>]
 
-# Dataset will be downloaded to the `data_original`
+# Paths for saving outputs and logs from the model training process.
 output_folder: !ref ../results/selfsupervised/Xvector/<seed>
 save_folder: !ref <output_folder>/save
 train_log: !ref <output_folder>/train_log.txt
 
-# URL for the ssl model, you can change to benchmark diffrenet models
-# Important: we use wav2vec2 base and not the fine-tuned one with ASR task
-# This allow you to have ~4% improvment
+# SSL (Self-Supervised Learning) Model Configuration
+# We choose the base model of wav2vec2 which is not fine-tuned to demonstrate the generalizability and potential improvements.
 sslmodel_hub: facebook/wav2vec2-base
 sslmodel_folder: !ref <save_folder>/ssl_checkpoint
 
-# Path where data manifest files will be stored
-data_folder: ../data  # e.g., /path/to/IEMOCAP_full_release
+# Directories for storing processed data and annotations.
+data_folder: ../data  # e.g., /path/to/data
 train_annotation: !ref <data_folder>/train_data.json
 valid_annotation: !ref <data_folder>/valid_data.json
 test_annotation: !ref <data_folder>/test_data.json
-test_annotation_0_spk: !ref <data_folder>/test_files_no_spk_data.json
-test_annotation_1_spk: !ref <data_folder>/test_files_1_spk_data.json
-test_annotation_2_spk: !ref <data_folder>/test_files_2_spk_data.json
-test_annotation_3_spk: !ref <data_folder>/test_files_3_spk_data.json
-test_annotation_4_spk: !ref <data_folder>/test_files_4_spk_data.json
 
-# The train logger writes training statistics to a file, as well as stdout.
+# Logger for recording training progress and statistics.
 train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
     save_file: !ref <train_log>
 
 
 ####################### Training Parameters ####################################
-number_of_epochs: 15
-batch_size: 128
-lr: 0.001
-lr_final: 0.0001
-lr_ssl: 0.00001
-#freeze all ssl
-freeze_ssl: False
-#set to true to freeze the CONV part of the ssl model
-# We see an improvement of 2% with freezing CNNs
-freeze_ssl_conv: True
+number_of_epochs: 5
+batch_size: 32
+lr: 0.001 # Learning rate for the model optimizer.
+lr_final: 0.0001 # Final learning rate after annealing.
+lr_ssl: 0.00001 # Learning rate specific to the SSL model components.
+
+# Control the freezing of model layers to fine-tune specific components.
+freeze_ssl: False # Freeze all layers of the SSL model.
+freeze_ssl_conv: True # Only freeze convolutional layers of the SSL model for potential performance improvement.
 
 ####################### Model Parameters #######################################
+# Dimensions for the encoder and embeddings used within the x-vector architecture.
 encoder_dim: 768
-emb_dim: 128
-out_n_neurons: 5
+emb_dim: 64
+out_n_neurons: 5 # Output neurons corresponding to the number of classes in the task.
 
-
+# DataLoader configuration to specify how training data is batched and handled during training.
 dataloader_options:
     batch_size: !ref <batch_size>
     shuffle: True
-    num_workers: 0  # 2 on linux but 0 works on windows
+    num_workers: 0  # Number of workers for data loading. Use 2 for Linux, 0 for Windows compatibility.
     drop_last: False
 
-# ssl encoder
+# Configuration for the SSL model loaded from Hugging Face's Transformers library.
 ssl_model: !new:speechbrain.lobes.models.huggingface_transformers.wav2vec2.Wav2Vec2
     source: !ref <sslmodel_hub>
     output_norm: True
@@ -63,23 +56,26 @@ ssl_model: !new:speechbrain.lobes.models.huggingface_transformers.wav2vec2.Wav2V
     freeze_feature_extractor: !ref <freeze_ssl_conv>
     save_path: !ref <sslmodel_folder>
 
+# Statistical pooling layer to aggregate model outputs.
 avg_pool: !new:speechbrain.nnet.pooling.StatisticsPooling
     return_std: False
 
-# Mean and std normalization of the input features
+# Normalization layer for mean and standard deviation adjustment of input features.
 mean_var_norm: !new:speechbrain.processing.features.InputNormalization
     norm_type: sentence
     std_norm: False
 
+# X-vector model configuration for generating embeddings from audio inputs.
 embedding_model: !new:speechbrain.lobes.models.Xvector.Xvector
     in_channels: !ref <encoder_dim>
     activation: !name:torch.nn.LeakyReLU
     tdnn_blocks: 3
-    tdnn_channels: [ 64, 64, 64 ]
-    tdnn_kernel_sizes: [ 5, 2, 3 ]
-    tdnn_dilations: [ 1, 2, 3 ]
+    tdnn_channels: [64, 64, 128]
+    tdnn_kernel_sizes: [5, 2, 1]
+    tdnn_dilations: [1, 2, 1]
     lin_neurons: !ref <emb_dim>
 
+# Classifier configuration for predicting output classes from embeddings.
 classifier: !new:speechbrain.lobes.models.Xvector.Classifier
     input_shape: [null, null, !ref <emb_dim>]
     activation: !name:torch.nn.LeakyReLU
@@ -87,35 +83,40 @@ classifier: !new:speechbrain.lobes.models.Xvector.Classifier
     lin_neurons: !ref <emb_dim>
     out_neurons: !ref <out_n_neurons>
 
-
-
+# Epoch counter to manage the training cycles.
 epoch_counter: !new:speechbrain.utils.epoch_loop.EpochCounter
     limit: !ref <number_of_epochs>
 
+# Grouping of modules for training.
 modules:
     ssl_model: !ref <ssl_model>
     mean_var_norm: !ref <mean_var_norm>
     embedding_model:  !ref <embedding_model>
     classifier: !ref <classifier>
 
+# Module list grouping for combined optimization.
 model: !new:torch.nn.ModuleList
     - [!ref <embedding_model>, !ref <classifier>]
 
+# Log softmax activation for output normalization.
 log_softmax: !new:speechbrain.nnet.activations.Softmax
     apply_log: True
 
+# Loss function for training.
 compute_cost: !name:speechbrain.nnet.losses.nll_loss
 
+# Metric statistics for evaluating model performance.
 error_stats: !name:speechbrain.utils.metric_stats.MetricStats
     metric: !name:speechbrain.nnet.losses.classification_error
         reduction: batch
 
+# Optimizers for the main model and the SSL components.
 opt_class: !name:torch.optim.Adam
     lr: !ref <lr>
-
 ssl_opt_class: !name:torch.optim.Adam
     lr: !ref <lr_ssl>
 
+# Learning rate schedulers for the main model and SSL model to improve training convergence.
 lr_annealing: !new:speechbrain.nnet.schedulers.NewBobScheduler
     initial_value: !ref <lr>
     improvement_threshold: 0.0025
@@ -127,6 +128,7 @@ lr_annealing_ssl: !new:speechbrain.nnet.schedulers.NewBobScheduler
     improvement_threshold: 0.0025
     annealing_factor: 0.9
 
+# Checkpointing configuration to save and recover training states.
 checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
     checkpoints_dir: !ref <save_folder>
     recoverables:
@@ -138,3 +140,4 @@ checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
         lr_annealing: !ref <lr_annealing>
         lr_annealing_ssl: !ref <lr_annealing_ssl>
         counter: !ref <epoch_counter>
+
