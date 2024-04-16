@@ -107,8 +107,8 @@ print("Creating segments....")
 
 
 def create_segments(x="train"):
-    segment_length = params["max_length"] / 60  # in seconds
-    sample_rate = params["samplerate"]
+    segment_length = int(params["max_length"] / 60)  # in seconds
+    sample_rate = int(params["samplerate"])
     file_list = get_all_files((os.path.join(params["out_folder"], f"{x}")), match_and=[".wav"])
 
     for file in tqdm(file_list, desc=f"Processing {x} segments"):
