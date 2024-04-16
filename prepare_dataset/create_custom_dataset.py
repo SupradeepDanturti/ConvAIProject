@@ -137,6 +137,7 @@ print("Adding Noise....")
 """
 Writes all the noises into a csv and creates noisifier and reverber objects
 """
+sample_rate = int(params["samplerate"])
 
 rir_audios = get_all_files(os.path.join(params["rirs_noises_root"], "simulated_rirs"), match_and=['.wav'])
 rir_audios.extend(
@@ -148,8 +149,8 @@ write_csv(rir_audios, os.path.join(params["out_folder"], "simulated_rirs.csv"))
 write_csv(noise_audios, os.path.join(params["out_folder"], "noises.csv"))
 
 noisifier = AddNoise(os.path.join(params["out_folder"], "noises.csv"), snr_low=5, snr_high=20)
-reverber = AddReverb(os.path.join(params["out_folder"], "simulated_rirs.csv"), reverb_sample_rate=params["samplerate"],
-                     clean_sample_rate=params["samplerate"])
+reverber = AddReverb(os.path.join(params["out_folder"], "simulated_rirs.csv"), reverb_sample_rate=sample_rate,
+                     clean_sample_rate=sample_rate)
 
 batch_size = 10
 probability_noise = 0.5
