@@ -9,25 +9,27 @@
 
 
 
-## **Steps Download, Create and Train all models**
+## **Setup and Training Instructions**
+To reproduce the results of this project, follow these steps.
 
-Pull codebase from github
 ```
-!git clone --filter=blob:none --no-checkout https://github.com/SupradeepDanturti/ConvAIProject
+!git clone https://github.com/SupradeepDanturti/ConvAIProject
 %cd ConvAIProject
 ```
+Download the project code from the GitHub repository and navigate into the project directory.
 
-Prepare the dataset
 
-1.   Download Dataset
 ```
 !python prepare_dataset/download_required_data.py --output_folder <destination_folder_path>
 ```
-2.   Create Damples
+Download the necessary datasets (LibriSpeech etc.), specifying the desired destination folder.
+
 ```
-!python prepare_dataset/create_custom_dataset.py dataset.yaml
+!python prepare_dataset/create_custom_dataset.py prepare_dataset/dataset.yaml
 ```
-dataset.yaml
+Create custom dataset based on set parameters as shown in the sample below
+
+Sample of dataset.yaml:
 ```
 n_sessions:
   train: 1000 # Creates 1000 sessions per class
@@ -36,23 +38,32 @@ n_sessions:
 n_speakers: 4 # max number of speakers. In this case the total classes will be 5 (0-4 speakers)
 max_length: 120 # max length in seconds for each session/utterance.
 ```
-3. Train XVector Model
+<center>Sample of dataset.yaml</center>
+
+To train the XVector model run the following command.
 ```
-!python xvector/train_xvector_augmentation.py xvector/hparams_xvector_augmentation.yaml
-```
-4. Train ECAPA-TDNN Model
-```
-!python ecapa_tdnn/train_ecapa_tdnn.py ecapa_tdnn/hparams_ecapa_tdnn_augmentation.yaml
-```
-5. Train Selfsupervised MLP(Linear Classifier)
-```
-!python selfsupervised/train_selfsupervised_mlp.py selfsupervised/hparams_selfsupervised_mlp.yaml
-```
-6. Train Selfsupervised XVector
-```
-!python selfsupervised/train_selfsupervised.py selfsupervised/hparams_selfsupervised_xvector.yaml
+!cd xvector
+!python train_xvector_augmentation.py hparams_xvector_augmentation.yaml
 ```
 
+To train the ECAPA-TDNN model run the following command.
+
+```
+!cd ecapa_tdnn
+!python train_ecapa_tdnn.py hparams_ecapa_tdnn_augmentation.yaml
+```
+
+To train the SelfSupervised MLP model run the following command.
+```
+!cd selfsupervised
+!python selfsupervised_mlp.py hparams_selfsupervised_mlp.yaml
+```
+
+To train the SelfSupervised XVector model run the following command.
+```
+!cd selfsupervised
+!python selfsupervised_xvector.py hparams_selfsupervised_xvector.yaml
+```
 
 
 
