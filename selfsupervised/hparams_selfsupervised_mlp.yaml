@@ -81,7 +81,7 @@ modules:
 # Module list grouping for combined optimization.
 model: !new:torch.nn.ModuleList
     - [!ref <output_mlp>]
-    -
+    
 # Log softmax activation for output normalization.
 log_softmax: !new:speechbrain.nnet.activations.Softmax
     apply_log: True
