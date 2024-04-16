@@ -6,12 +6,29 @@ import os
 import torch
 import numpy as np
 import torchaudio
-from tqdm import tqdm
 import json
-from speechbrain.augment.time_domain import AddNoise, AddReverb
 
 
 def create_mixture(session_n, output_dir, params, metadata):
+    """
+    Constructs an audio mixture from multiple source files based on session metadata and saves the resulting mixture
+    along with the updated metadata.
+
+    Parameters:
+        - session_n (str): Identifier for the session, used to name the output directory and files.
+        - output_dir (str): Base directory to store the generated audio mixtures and metadata.
+        - params (dict): Parameters for audio processing, including 'max_length', 'samplerate', and
+                        'librispeech_root'. 'max_length' specifies the maximum length of the mixture
+                        in seconds, 'samplerate' is the sample rate for the audio files, and 'librispeech_root'
+                        is the path to the directory containing source audio files.
+        - metadata (dict): A nested dictionary where the outer key is the session identifier, and the inner keys
+                           are speaker IDs with each containing a list of utterances. Each utterance is a dictionary
+                           detailing the start and stop times, file path, and optionally words spoken.
+    Returns:
+        None. The function saves the audio mixture as a WAV file and the session metadata as a JSON file in the
+        specified output directory.
+    """
+
     os.makedirs(os.path.join(output_dir, session_n), exist_ok=True)
     session_meta = {}
 
@@ -48,7 +65,7 @@ def create_mixture(session_n, output_dir, params, metadata):
                 })
 
             else:
-                """We create 1-4 speaker utterances"""
+                """We create 1- n-speaker utterances"""
                 audio_path = os.path.join(params["librispeech_root"], utterance["file"])
                 audio, _ = torchaudio.load(audio_path)
 

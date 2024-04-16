@@ -1,34 +1,34 @@
-
 # Basic configuration for reproducibility
 seed: 1986
 __set_seed: !!python/object/apply:torch.manual_seed [!ref <seed>]
 
-# Output directories
-output_folder: !ref ./results/ECAPA/Augmented/<seed>
+# Output directories for saving the results, model checkpoints, and logs
+output_folder: !ref ../results/ECAPA/Augmented/<seed>
 save_folder: !ref <output_folder>/save
 train_log: !ref <output_folder>/train_log.txt
 
-# Data paths
-data_folder: ./maindata
+# Paths to dataset annotations and noise profiles for augmentation
+data_folder: ../data
 train_annotation: !ref <data_folder>/train_data.json
 valid_annotation: !ref <data_folder>/valid_data.json
 test_annotation: !ref <data_folder>/test_data.json
-
-# # Noise and RIR configuration for data augmentation
-# NOISE_DATASET_URL: https://www.dropbox.com/scl/fi/a09pj97s5ifan81dqhi4n/noises.zip?rlkey=j8b0n9kdjdr32o1f06t0cw5b7&dl=1
-# RIR_DATASET_URL: https://www.dropbox.com/scl/fi/linhy77c36mu10965a836/RIRs.zip?rlkey=pg9cu8vrpn2u173vhiqyu743u&dl=1
+test_annotation_0_spk: !ref <data_folder>/test_files_no_spk_data.json
+test_annotation_1_spk: !ref <data_folder>/test_files_1_spk_data.json
+test_annotation_2_spk: !ref <data_folder>/test_files_2_spk_data.json
+test_annotation_3_spk: !ref <data_folder>/test_files_3_spk_data.json
+test_annotation_4_spk: !ref <data_folder>/test_files_4_spk_data.json
 
 noise_annotation: !ref <data_folder>/noises.csv
 rir_annotation: !ref <data_folder>/simulated_rirs.csv
 
-# Training parameters
+# Training hyperparameters
 sample_rate: 16000
 number_of_epochs: 50
 batch_size: 64
 lr_start: 0.001
 lr_final: 0.0001
 weight_decay: 0.00002
-num_workers: 0 # for Windows 
+num_workers: 0 # Number of workers set to 0 for compatibility with Windows and 4 with Linux
 n_classes: 5
 dim: 192
 num_attention_channels: 128
@@ -39,24 +39,22 @@ mode: exp_range
 gamma: 0.9998
 base_lr: 0.000001
 max_lr: !ref <lr>
-step_size: 396
+step_size: 396 # 4 times number of iterations/epoch (2 to 10 is suggested)
 
 dataloader_options:
     batch_size: !ref <batch_size>
     num_workers: !ref <num_workers>
     shuffle: !ref <shuffle>
 
-# Checkpoint settings
+# Checkpointing configuration to enable and set intervals
 ckpt_enable: True
 ckpt_interval_minutes: 15
 
 # Feature extraction parameters
 n_mels: 80
 
-# Data Augmentation settings
+# Data Augmentation settings, including noise, speed, reverb, frequency, and temporal dropping
 skip_prep: True
-
-# Add noise to input signal
 snr_low: 0  # Min SNR for noise augmentation
 snr_high: 15  # Max SNR for noise augmentation
 
@@ -94,18 +92,6 @@ drop_freq: !new:speechbrain.augment.time_domain.DropFreq
     drop_freq_count_high: !ref <drop_freq_count_high>
     drop_freq_width: !ref <drop_freq_width>
 
-# Time drop: randomly drops a number of temporal chunks.
-drop_chunk_count_low: 1  # Min number of audio chunks to drop
-drop_chunk_count_high: 5  # Max number of audio chunks to drop
-drop_chunk_length_low: 1000  # Min length of audio chunks to drop
-drop_chunk_length_high: 2000  # Max length of audio chunks to drop
-
-drop_chunk: !new:speechbrain.augment.time_domain.DropChunk
-    drop_length_low: !ref <drop_chunk_length_low>
-    drop_length_high: !ref <drop_chunk_length_high>
-    drop_count_low: !ref <drop_chunk_count_low>
-    drop_count_high: !ref <drop_chunk_count_high>
-
 wav_augment: !new:speechbrain.augment.augmenter.Augmenter
     parallel_augment: False
     concat_original: True
@@ -117,14 +103,13 @@ wav_augment: !new:speechbrain.augment.augmenter.Augmenter
     augmentations: [
         !ref <add_noise>,
         !ref <speed_perturb>,
-        !ref <drop_freq>,
-        !ref <drop_chunk>]
+        !ref <drop_freq>]
 
-# Feature extraction
+# Feature extraction and normalization configuration
 compute_features: !new:speechbrain.lobes.features.Fbank
     n_mels: !ref <n_mels>
         
-# Mean and std normalization of the input features
+# Model components configuration for ECAPA-TDNN
 mean_var_norm: !new:speechbrain.processing.features.InputNormalization
     norm_type: sentence
     std_norm: False
@@ -155,24 +140,23 @@ modules:
     classifier: !ref <classifier>
     mean_var_norm: !ref <mean_var_norm>
 
+# Loss configuration with margin and scale parameters
 compute_cost: !new:speechbrain.nnet.losses.LogSoftmaxWrapper
     loss_fn: !new:speechbrain.nnet.losses.AdditiveAngularMargin
         margin: 0.2
         scale: 30
 
-# Optimizer configuration
+# Optimizer and learning rate scheduler settings
 opt_class: !name:torch.optim.Adam
     lr: !ref <lr_start>
     weight_decay: !ref <weight_decay>
 
-# Learning rate scheduling
-        
 lr_annealing: !new:speechbrain.nnet.schedulers.CyclicLRScheduler
     base_lr: !ref <base_lr>
     max_lr: !ref <max_lr>
-    step_size: !ref <step_size>
+    step_size: !ref <step_size> # 4 times number of iterations/epoch (2 to 10 is suggested)
 
-# Logging
+# Logging and metric evaluation settings
 train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
     save_file: !ref <train_log>
 
@@ -181,7 +165,7 @@ error_stats: !name:speechbrain.utils.metric_stats.MetricStats
         reduction: batch
 
 
-# Checkpointing to save and resume training
+# Checkpoint management for model saving and recovery
 checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
     checkpoints_dir: !ref <save_folder>
     recoverables:

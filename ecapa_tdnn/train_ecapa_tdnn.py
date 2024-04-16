@@ -1,7 +1,3 @@
-        
-        
-#!/usr/bin/env python3
-
 import os
 import sys
 import torch
@@ -38,10 +34,10 @@ class ECAPABrain(sb.Brain):
         """Computes the loss using speaker-id as label."""
         predictions, lens = predictions
         spkenc, _ = batch.num_speakers_encoded
-        # 
-        # # Concatenate labels (due to data augmentation)
-        # if stage == sb.Stage.TRAIN and hasattr(self.hparams, "wav_augment"):
-        #     spkenc = self.hparams.wav_augment.replicate_labels(spkenc)
+
+        # Concatenate labels (due to data augmentation)
+        if stage == sb.Stage.TRAIN and hasattr(self.hparams, "wav_augment"):
+            spkenc = self.hparams.wav_augment.replicate_labels(spkenc)
 
         loss = self.hparams.compute_cost(predictions, spkenc, lens)
 
@@ -83,11 +79,6 @@ class ECAPABrain(sb.Brain):
                 meta={"ErrorRate": stage_stats["ErrorRate"]},
                 min_keys=["ErrorRate"],
             )
-        if stage == sb.Stage.TEST:
-            self.hparams.train_logger.log_stats(
-                {"Epoch loaded": self.hparams.epoch_counter.current},
-                test_stats=stage_stats,
-            )
 
 def dataio_prep(hparams):
     """Prepares the data IO (loading datasets, defining processing pipelines)"""
@@ -114,7 +105,7 @@ def dataio_prep(hparams):
 
     # Create datasets
     datasets = {}
-    for dataset_name in ["train", "valid", "test"]:
+    for dataset_name in ["train", "valid", "test", "test_0_spk", "test_1_spk", "test_2_spk", "test_3_spk", "test_4_spk"]:
         datasets[dataset_name] = sb.dataio.dataset.DynamicItemDataset.from_json(
             json_path=hparams[f"{dataset_name}_annotation"],
             dynamic_items=[audio_pipeline, label_pipeline],
@@ -170,6 +161,42 @@ if __name__ == "__main__":
     # Evaluate the model
     ecapa_brain.evaluate(
         test_set=datasets["test"],
+        min_key="error",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+    print("Error of No spk class")
+    ecapa_brain.evaluate(
+        test_set=datasets["test_0_spk"],
+        min_key="error",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+    print("Error of No spk class")
+    ecapa_brain.evaluate(
+        test_set=datasets["test_0_spk"],
+        min_key="error",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+    print("Error of 1 spk class")
+    ecapa_brain.evaluate(
+        test_set=datasets["test_1_spk"],
+        min_key="error",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+    print("Error of 2 spk class")
+    ecapa_brain.evaluate(
+        test_set=datasets["test_2_spk"],
+        min_key="error",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+    print("Error of 3 spk class")
+    ecapa_brain.evaluate(
+        test_set=datasets["test_3_spk"],
+        min_key="error",
+        test_loader_kwargs=hparams["dataloader_options"],
+    )
+    print("Error of 4 spk class")
+    ecapa_brain.evaluate(
+        test_set=datasets["test_4_spk"],
         min_key="error",
         test_loader_kwargs=hparams["dataloader_options"],
     )
