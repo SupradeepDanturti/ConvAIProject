@@ -3,12 +3,15 @@
 This project implements and compares speaker counting techniques for challenging overlapping speech scenarios, including self-supervised approaches.
 
 **Data Preparation**: Custom dataset creation with flexible parameters (number of speakers, segment lengths)
+
 **Models**:
 - X-Vector
 - ECAPA-TDNN
 - Self-supervised Wav2Vec 2.0 with MLP classifier
 - Self-supervised Wav2Vec 2.0 with X-Vector
+
 **Training**: Hyperparameters provided for model training
+
 **Inference**: Simple-to-use interface scripts for running trained models on new audio
 
 ## **Prerequisites**
