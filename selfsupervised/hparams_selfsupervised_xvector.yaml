@@ -18,7 +18,11 @@ data_folder: ../data  # e.g., /path/to/data
 train_annotation: !ref <data_folder>/train_data.json
 valid_annotation: !ref <data_folder>/valid_data.json
 test_annotation: !ref <data_folder>/test_data.json
-
+test_annotation_0_spk: !ref <data_folder>/test_files_no_spk_data.json
+test_annotation_1_spk: !ref <data_folder>/test_files_1_spk_data.json
+test_annotation_2_spk: !ref <data_folder>/test_files_2_spk_data.json
+test_annotation_3_spk: !ref <data_folder>/test_files_3_spk_data.json
+test_annotation_4_spk: !ref <data_folder>/test_files_4_spk_data.json
 # Logger for recording training progress and statistics.
 train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
     save_file: !ref <train_log>
@@ -38,7 +42,7 @@ freeze_ssl_conv: True # Only freeze convolutional layers of the SSL model for po
 ####################### Model Parameters #######################################
 # Dimensions for the encoder and embeddings used within the x-vector architecture.
 encoder_dim: 768
-emb_dim: 64
+emb_dim: 128
 out_n_neurons: 5 # Output neurons corresponding to the number of classes in the task.
 
 # DataLoader configuration to specify how training data is batched and handled during training.
@@ -69,10 +73,10 @@ mean_var_norm: !new:speechbrain.processing.features.InputNormalization
 embedding_model: !new:speechbrain.lobes.models.Xvector.Xvector
     in_channels: !ref <encoder_dim>
     activation: !name:torch.nn.LeakyReLU
-    tdnn_blocks: 3
-    tdnn_channels: [64, 64, 128]
-    tdnn_kernel_sizes: [5, 2, 1]
-    tdnn_dilations: [1, 2, 1]
+    tdnn_blocks: 5
+    tdnn_channels: [ 64, 64, 64, 64, 128 ]
+    tdnn_kernel_sizes: [ 5, 2, 3, 2, 1 ]
+    tdnn_dilations: [ 1, 2, 3, 2, 1 ]
     lin_neurons: !ref <emb_dim>
 
 # Classifier configuration for predicting output classes from embeddings.
@@ -140,4 +144,3 @@ checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
         lr_annealing: !ref <lr_annealing>
         lr_annealing_ssl: !ref <lr_annealing_ssl>
         counter: !ref <epoch_counter>
-
