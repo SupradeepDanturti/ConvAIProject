@@ -1,34 +1,31 @@
-# **ConvAIProject Project 7: Overlap Detector + Speaker Counter** 
-- The objective of this project  is to build a speaker counter for meeting recordings using speech technology. Meetings often have overlapping speech and speech separation technologies such as SepFormer (implemented in SpeechBrain) can separate the speech into individual tracks for each speaker.
-- However, before speech separation can be applied, the segments of the recording that contain overlapping speech must be identified. This can be done with a neural network that inputs a short speech segment and outputs the number of speakers present in the segment.
-- The output could be 0, 1, 2, or 3, representing no speakers, one speaker, two speakers, or three or more speakers, respectively.  The student is tasked with the following steps to achieve this goal:  Reviewing the literature on speaker counting.
-- Implementing a data simulator that creates overlapping speech signals by sampling clean data from a large dataset (e.g. librispeech-clean-100) and adding noise and reverberation from the open-rir dataset with a specified probability (e.g. 0.5).
-- Implementing and testing at least two models for speaker counting, such as x-vectors or ECAPA-TDNN (or any other model proposed by the students), with input being a 1-2 second speech segment.
-- Implementing the inference stage where the model can process long recordings by chunking them into 1-2 second segments and making a decision on the number of speakers present in each segment. The output should be in the form of a text file indicating the start and end times of each segment and the decision made by the model.
-- For instance: 0.00 1.00 0 (mo speech) 1.00 5.50 1 (1 speaker) 5.50 6.55 2 (two speakers) 6.55 10.34  1 (1 speaker)  Where each line contains begin_second, end_second, classifier decision.  Integrating the code into the main SpeechBrain project and making the best model available on the SpeechBrain repository for use by others. Develop and interface for inference purposes, similar to the one available for the VAD.
+# **Overlap Detector + Speaker Counter** 
 
+This project implements and compares speaker counting techniques for challenging overlapping speech scenarios, including self-supervised approaches.
 
+**Data Preparation**: Custom dataset creation with flexible parameters (number of speakers, segment lengths)
+**Models**:
+- X-Vector
+- ECAPA-TDNN
+- Self-supervised Wav2Vec 2.0 with MLP classifier
+- Self-supervised Wav2Vec 2.0 with X-Vector
+**Training**: Hyperparameters provided for model training
+**Inference**: Simple-to-use interface scripts for running trained models on new audio
 
-## **Setup and Training Instructions**
-To reproduce the results of this project, follow these steps.
+## **Prerequisites**
+- Python (version 3.7 or above)
+ - speechbrain toolkit (pip install speechbrain)
 
+## **Installation**
 ```
 !git clone https://github.com/SupradeepDanturti/ConvAIProject
 %cd ConvAIProject
 ```
-Download the project code from the GitHub repository and navigate into the project directory.
-
-
+## **Dataset Preparation**
 ```
 !python prepare_dataset/download_required_data.py --output_folder <destination_folder_path>
-```
-Download the necessary datasets (LibriSpeech etc.), specifying the desired destination folder.
-
-```
 !python prepare_dataset/create_custom_dataset.py prepare_dataset/dataset.yaml
 ```
-Create custom dataset based on set parameters as shown in the sample below
-
+Edit dataset.yaml to customize the number of sessions, speakers, and segment lengths.
 Sample of dataset.yaml:
 ```
 n_sessions:
@@ -38,34 +35,60 @@ n_sessions:
 n_speakers: 4 # max number of speakers. In this case the total classes will be 5 (0-4 speakers)
 max_length: 120 # max length in seconds for each session/utterance.
 ```
-<center>Sample of dataset.yaml</center>
-
+## **Model Training**
 To train the XVector model run the following command.
 ```
+# Train X-Vector model:
 !cd xvector
-!python train_xvector_augmentation.py hparams_xvector_augmentation.yaml
-```
+!python train_xvector_augmentation.py hparams_xvector_augmentation.yaml 
 
-To train the ECAPA-TDNN model run the following command.
-
-```
+# Train other models (follow similar pattern):
 !cd ecapa_tdnn
-!python train_ecapa_tdnn.py hparams_ecapa_tdnn_augmentation.yaml
-```
+!python train_ecapa_tdnn.py hparams_ecapa_tdnn_augmentation.yaml 
 
-To train the SelfSupervised MLP model run the following command.
-```
 !cd selfsupervised
 !python selfsupervised_mlp.py hparams_selfsupervised_mlp.yaml
-```
 
-To train the SelfSupervised XVector model run the following command.
-```
 !cd selfsupervised
 !python selfsupervised_xvector.py hparams_selfsupervised_xvector.yaml
 ```
 
+## **Inference Interface**
+To run interface for XVector & ECAPA-TDNN
+```
+""" This is used for Both XVector and ECAPA-TDNN """
 
+from interface.SpeakerCounter import SpeakerCounter
 
+wav_path = "interface/sample_audio1.wav"  # Path to your audio file
+save_dir = "interface/sample_inference_run2/" # Where to save results
+model_path = "interface/xvector" # /ecapa_tdnn  # Path to your trained model
 
+# Create classifier object
+audio_classifier = SpeakerCounter.from_hparams(source=model_path, savedir=save_dir)
 
+# Run inference on the audio file
+audio_classifier.classify_file(wav_path)
+```
+For Selfsupervised model
+```
+
+from interface.SpeakerCounterSelfsupervisedMLP import SpeakerCounter
+
+wav_path = "interface/sample_audio1.wav" # Path to your audio file
+save_dir = "interface/sample_inference_run" # Where to save results
+model_path = "interface/selfsupervised_mlp" # Path to your trained model
+
+# Create classifier object
+audio_classifier = SpeakerCounter.from_hparams(source=model_path, savedir=save_dir)
+
+# Run inference on the audio file
+audio_classifier.classify_file(wav_path)
+```
+
+## **Project Structure**
+- prepare_dataset/ : Scripts for dataset downloading and creation
+- xvector/ : X-Vector model implementation and training
+- ecapa_tdnn/ : ECAPA-TDNN implementation and training
+- selfsupervised/ : Self-supervised models implementation and training
+- interface/ : Inference scripts
