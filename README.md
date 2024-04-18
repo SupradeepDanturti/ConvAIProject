@@ -2,6 +2,13 @@
 
 This project implements and compares speaker counting techniques for challenging overlapping speech scenarios, including self-supervised approaches.
 
+## **Project Structure**
+- prepare_dataset/ : Scripts for dataset downloading and creation
+- xvector/ : X-Vector model implementation and training
+- ecapa_tdnn/ : ECAPA-TDNN implementation and training
+- selfsupervised/ : Self-supervised models implementation and training
+- interface/ : Inference scripts
+
 **Data Preparation**: Custom dataset creation with flexible parameters (number of speakers, segment lengths)
 
 **Models**:
@@ -89,9 +96,4 @@ audio_classifier = SpeakerCounter.from_hparams(source=model_path, savedir=save_d
 audio_classifier.classify_file(wav_path)
 ```
 
-## **Project Structure**
-- prepare_dataset/ : Scripts for dataset downloading and creation
-- xvector/ : X-Vector model implementation and training
-- ecapa_tdnn/ : ECAPA-TDNN implementation and training
-- selfsupervised/ : Self-supervised models implementation and training
-- interface/ : Inference scripts
+
