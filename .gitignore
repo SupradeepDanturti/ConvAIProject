@@ -13,3 +13,5 @@
 .gitignore
 .gitattributes
 data/
+train_logs/
+report/
