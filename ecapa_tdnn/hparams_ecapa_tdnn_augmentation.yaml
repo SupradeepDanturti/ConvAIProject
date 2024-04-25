@@ -23,7 +23,7 @@ rir_annotation: !ref <data_folder>/simulated_rirs.csv
 
 # Training hyperparameters
 sample_rate: 16000
-number_of_epochs: 20
+number_of_epochs: 1
 batch_size: 64
 lr_start: 0.001
 lr_final: 0.0001
