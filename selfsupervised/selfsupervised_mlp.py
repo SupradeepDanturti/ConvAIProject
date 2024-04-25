@@ -182,7 +182,7 @@ def dataio_prep(hparams):
     data_info = {
         "train": hparams["train_annotation"],
         "valid": hparams["valid_annotation"],
-        # "test": hparams["test_annotation"],
+        "test": hparams["test_annotation"],
         "test_annotation_0_spk": hparams["test_annotation_0_spk"],
         "test_annotation_1_spk": hparams["test_annotation_1_spk"],
         "test_annotation_2_spk": hparams["test_annotation_2_spk"],
