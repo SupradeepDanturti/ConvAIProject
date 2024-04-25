@@ -42,7 +42,7 @@ deltas: True
 
 # Training Parameters
 sample_rate: 16000
-number_of_epochs: 50
+number_of_epochs: 1
 batch_size: 64
 lr_start: 0.001
 lr_final: 0.0001
