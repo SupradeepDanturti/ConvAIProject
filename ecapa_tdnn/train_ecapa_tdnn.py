@@ -164,39 +164,39 @@ if __name__ == "__main__":
         min_key="error",
         test_loader_kwargs=hparams["dataloader_options"],
     )
-    print("Error of No spk class")
-    ecapa_brain.evaluate(
-        test_set=datasets["test_0_spk"],
-        min_key="error",
-        test_loader_kwargs=hparams["dataloader_options"],
-    )
-    print("Error of No spk class")
-    ecapa_brain.evaluate(
-        test_set=datasets["test_0_spk"],
-        min_key="error",
-        test_loader_kwargs=hparams["dataloader_options"],
-    )
-    print("Error of 1 spk class")
-    ecapa_brain.evaluate(
-        test_set=datasets["test_1_spk"],
-        min_key="error",
-        test_loader_kwargs=hparams["dataloader_options"],
-    )
-    print("Error of 2 spk class")
-    ecapa_brain.evaluate(
-        test_set=datasets["test_2_spk"],
-        min_key="error",
-        test_loader_kwargs=hparams["dataloader_options"],
-    )
-    print("Error of 3 spk class")
-    ecapa_brain.evaluate(
-        test_set=datasets["test_3_spk"],
-        min_key="error",
-        test_loader_kwargs=hparams["dataloader_options"],
-    )
-    print("Error of 4 spk class")
-    ecapa_brain.evaluate(
-        test_set=datasets["test_4_spk"],
-        min_key="error",
-        test_loader_kwargs=hparams["dataloader_options"],
-    )
+    # print("Error of No spk class")
+    # ecapa_brain.evaluate(
+    #     test_set=datasets["test_0_spk"],
+    #     min_key="error",
+    #     test_loader_kwargs=hparams["dataloader_options"],
+    # )
+    # print("Error of No spk class")
+    # ecapa_brain.evaluate(
+    #     test_set=datasets["test_0_spk"],
+    #     min_key="error",
+    #     test_loader_kwargs=hparams["dataloader_options"],
+    # )
+    # print("Error of 1 spk class")
+    # ecapa_brain.evaluate(
+    #     test_set=datasets["test_1_spk"],
+    #     min_key="error",
+    #     test_loader_kwargs=hparams["dataloader_options"],
+    # )
+    # print("Error of 2 spk class")
+    # ecapa_brain.evaluate(
+    #     test_set=datasets["test_2_spk"],
+    #     min_key="error",
+    #     test_loader_kwargs=hparams["dataloader_options"],
+    # )
+    # print("Error of 3 spk class")
+    # ecapa_brain.evaluate(
+    #     test_set=datasets["test_3_spk"],
+    #     min_key="error",
+    #     test_loader_kwargs=hparams["dataloader_options"],
+    # )
+    # print("Error of 4 spk class")
+    # ecapa_brain.evaluate(
+    #     test_set=datasets["test_4_spk"],
+    #     min_key="error",
+    #     test_loader_kwargs=hparams["dataloader_options"],
+    # )
