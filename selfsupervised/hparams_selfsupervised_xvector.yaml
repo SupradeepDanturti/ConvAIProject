@@ -29,7 +29,7 @@ train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
 
 
 ####################### Training Parameters ####################################
-number_of_epochs: 5
+number_of_epochs: 1 
 batch_size: 32
 lr: 0.001 # Learning rate for the model optimizer.
 lr_final: 0.0001 # Final learning rate after annealing.
