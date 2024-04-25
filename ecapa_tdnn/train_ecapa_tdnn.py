@@ -4,6 +4,7 @@ import torch
 import torchaudio
 import speechbrain as sb
 from hyperpyyaml import load_hyperpyyaml
+from speechbrain.utils import hpopt as hp
 
 class ECAPABrain(sb.Brain):
     """Class that manages the training loop. See speechbrain.core.Brain."""
@@ -75,9 +76,16 @@ class ECAPABrain(sb.Brain):
                 train_stats=self.train_stats,
                 valid_stats=stage_stats,
             )
-            self.checkpointer.save_and_keep_only(
-                meta={"ErrorRate": stage_stats["ErrorRate"]},
-                min_keys=["ErrorRate"],
+            if self.hparams.ckpt_enable:
+              self.checkpointer.save_and_keep_only(
+                  meta={"ErrorRate": stage_stats["ErrorRate"]},
+                  min_keys=["ErrorRate"],
+              )
+            hp.report_result(stage_stats)
+        if stage == sb.Stage.TEST:
+            self.hparams.train_logger.log_stats(
+                {"Epoch loaded": self.hparams.epoch_counter.current},
+                test_stats=stage_stats,
             )
 
 def dataio_prep(hparams):
@@ -123,80 +131,48 @@ def dataio_prep(hparams):
     return datasets
 
 if __name__ == "__main__":
-    # Loading the hyperparameters file and command line arguments
-    hparams_file, run_opts, overrides = sb.parse_arguments(sys.argv[1:])
 
-    # Load hyperparameter configuration file
-    with open(hparams_file) as fin:
-        hparams = load_hyperpyyaml(fin, overrides)
+    with hp.hyperparameter_optimization(objective_key="ErrorRate") as hp_ctx:
+      # Loading the hyperparameters file and command line arguments
+      hparams_file, run_opts, overrides = hp_ctx.parse_arguments(
+        sys.argv[1:], pass_trial_id=False)
 
-    # Create experiment directory
-    sb.core.create_experiment_directory(
-        experiment_directory=hparams["output_folder"],
-        hyperparams_to_save=hparams_file,
-        overrides=overrides,
-    )
+      # Load hyperparameter configuration file
+      with open(hparams_file) as fin:
+          hparams = load_hyperpyyaml(fin, overrides)
 
-    # Prepare data IO
-    datasets = dataio_prep(hparams)
+      # Create experiment directory
+      sb.core.create_experiment_directory(
+          experiment_directory=hparams["output_folder"],
+          hyperparams_to_save=hparams_file,
+          overrides=overrides,
+      )
 
-    # Initialize the Brain object for training the ECAPA-TDNN model
-    ecapa_brain = ECAPABrain(
-        modules=hparams["modules"],
-        opt_class=hparams["opt_class"],
-        hparams=hparams,
-        run_opts=run_opts,
-        checkpointer=hparams["checkpointer"],
-    )
+      # Prepare data IO
+      datasets = dataio_prep(hparams)
 
-    # Train the model
-    ecapa_brain.fit(
-        epoch_counter=ecapa_brain.hparams.epoch_counter,
-        train_set=datasets["train"],
-        valid_set=datasets["valid"],
-        train_loader_kwargs=hparams["dataloader_options"],
-        valid_loader_kwargs=hparams["dataloader_options"],
-    )
+      # Initialize the Brain object for training the ECAPA-TDNN model
+      ecapa_brain = ECAPABrain(
+          modules=hparams["modules"],
+          opt_class=hparams["opt_class"],
+          hparams=hparams,
+          run_opts=run_opts,
+          checkpointer=hparams["checkpointer"],
+      )
 
-    # Evaluate the model
-    ecapa_brain.evaluate(
-        test_set=datasets["test"],
-        min_key="error",
-        test_loader_kwargs=hparams["dataloader_options"],
-    )
-    # print("Error of No spk class")
-    # ecapa_brain.evaluate(
-    #     test_set=datasets["test_0_spk"],
-    #     min_key="error",
-    #     test_loader_kwargs=hparams["dataloader_options"],
-    # )
-    # print("Error of No spk class")
-    # ecapa_brain.evaluate(
-    #     test_set=datasets["test_0_spk"],
-    #     min_key="error",
-    #     test_loader_kwargs=hparams["dataloader_options"],
-    # )
-    # print("Error of 1 spk class")
-    # ecapa_brain.evaluate(
-    #     test_set=datasets["test_1_spk"],
-    #     min_key="error",
-    #     test_loader_kwargs=hparams["dataloader_options"],
-    # )
-    # print("Error of 2 spk class")
-    # ecapa_brain.evaluate(
-    #     test_set=datasets["test_2_spk"],
-    #     min_key="error",
-    #     test_loader_kwargs=hparams["dataloader_options"],
-    # )
-    # print("Error of 3 spk class")
-    # ecapa_brain.evaluate(
-    #     test_set=datasets["test_3_spk"],
-    #     min_key="error",
-    #     test_loader_kwargs=hparams["dataloader_options"],
-    # )
-    # print("Error of 4 spk class")
-    # ecapa_brain.evaluate(
-    #     test_set=datasets["test_4_spk"],
-    #     min_key="error",
-    #     test_loader_kwargs=hparams["dataloader_options"],
-    # )
+      # Train the model
+      ecapa_brain.fit(
+          epoch_counter=ecapa_brain.hparams.epoch_counter,
+          train_set=datasets["train"],
+          valid_set=datasets["valid"],
+          train_loader_kwargs=hparams["dataloader_options"],
+          valid_loader_kwargs=hparams["dataloader_options"],
+      )
+
+      # Evaluate the model
+      if not hp_ctx.enabled:
+        ecapa_brain.evaluate(
+          test_set=datasets["test"],
+          min_key="error",
+          test_loader_kwargs=hparams["dataloader_options"],
+        )
